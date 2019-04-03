@@ -10,6 +10,7 @@ Arbitrarily selected from the following sets:
 - 10 with low proportion of chromosomes corresponding to composition detected genomic islands (detected using IslandPath-DIMOB).
 
 The data used to select the taxa is listed in `data/gi_plasmid_analysis.tsv` and the details of the select taxa are listed in `data/taxa_metadata.tsv`
+The sequences themselves are in `data/sequences/sequences.tar.bz2`
 
 ### Plasmid Copy Number
 
