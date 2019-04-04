@@ -41,17 +41,15 @@ fq2fa --merge metagenome_trimmed1.fq.gz metagenome_trimmed2.fq.gz metagenome_tri
 
 # non-gradated
 mkdir -p p100/bins
-idba_ud -r p100/p100_metagenome.fna -o p100
+idba_ud -num_threads 40 -r p100/p100_metagenome.fna -o p100
 ref=p100/contigs.fa
 
 bowtie2-build -f --threads 40 $ref $ref
 
-bowtie2 -q --sensitive-local -x p100/contigs.fa --interleaved metagenome_trimmed.fna -S p100/p100.sam
-samtools view -S -b p100/p100.sam > p100/p100.bam
-samtools sort p100/p100.bam -o p100/p100_sorted.bam
+bowtie2 -p 40 j-q --sensitive-local -x p100/contigs.fa --interleaved metagenome_trimmed.fna -S p100/p100.sam
+samtools view -@ 40 -S -b p100/p100.sam > p100/p100.bam
+samtools sort -@ 40 -o p100/p100_sorted.bam p100/p100.bam
 
-runMetaBat.sh p100/contigs.fa p100/p100_sorted.bam p100/bins 
-##metabat2
-#
+runMetaBat.sh -t 40 p100/contigs.fa p100/p100_sorted.bam 
 ##concoct
 #
