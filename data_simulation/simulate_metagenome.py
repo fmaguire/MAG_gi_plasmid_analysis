@@ -118,6 +118,5 @@ if __name__ == '__main__':
     metagenome_fasta_fp = build_metagenome_fasta(seq_data_folder, metadata)
 
     # fragement length is a bit arbitrary
-    subprocess.check_call(f'art_illumina --rndSeed 42 --seqSys MSv3 --in {metagenome_fasta_fp} --len 250 --fcov 5 --out metagenome --mflen 1000 --sdev 50',
-                            shell=True)
+    subprocess.check_call(f'art_illumina --noALN --rndSeed 42 --seqSys MSv3 --in {metagenome_fasta_fp} --len 250 --fcov 2.9 --out metagenome --mflen 1000 --sdev 50', shell=True)
 
