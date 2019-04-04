@@ -53,15 +53,17 @@
 
 # non-gradated
 mkdir -p p100/bins
-idba_ud --num_threads 48 -r metagenome_trimmed.fna -o p100
-ref=p100/contig.fa
+
+spades.py --meta -o output -1 metagenome_trimmed1.fq.gz -2 metagenome_trimmed2.fq.gz -t 48
+
+ref=output/contigs.fasta
 
 bowtie2-build -f --threads 48 $ref $ref
 
-bowtie2 -p 48 -f --sensitive-local -x p100/contigs.fa --interleaved metagenome_trimmed.fna -S p100/p100.sam
-samtools view -@ 48 -S -b p100/p100.sam > p100/p100.bam
-samtools sort -@ 48 -o p100/p100_sorted.bam p100/p100.bam
+bowtie2 -p 48 -f --sensitive-local -x "$ref" --interleaved metagenome_trimmed.fna -S output/p100.sam
+samtools view -@ 48 -S -b output/p100.sam > output/p100.bam
+samtools sort -@ 48 -o output/p100_sorted.bam output/p100.bam
 
-runMetaBat.sh -m 1500 -t 48 "$ref" p100/p100_sorted.bam 
+runMetaBat.sh -m 1500 -t 48 "$ref" output/p100_sorted.bam 
 ##concoct
 #

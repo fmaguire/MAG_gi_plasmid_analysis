@@ -53,4 +53,12 @@ reasonable comparison of these methods)
 
 ## MAG assessment
 
-...
+- Annotate recovered genomes and original genomes with prokka on Vanilla
+
+- predict GI from recovered genome with islandpath-DIMOB
+
+- create list of genes in GI and non-GI of each genome
+
+- look at proportion of missed genes in GI and non-GI of each genome
+
+
