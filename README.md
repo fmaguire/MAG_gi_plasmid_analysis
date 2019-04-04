@@ -17,13 +17,10 @@ The sequences themselves are in `data/sequences/sequences.tar.bz2`
 Due to a dearth of database resources with known copy numbers each plasmid was randomly selected to be low copy number (1-20), medium copy number (20-100), and high copy number (500-1000).
 The exact copy number was randomly selected using a gamma distribution parameterised towards the lower bound for each regime.
 
-This was performed using the `data_simulation/generate_copy_numbers.py` script.
 
 ### Organism Relative Abundance
 
 Relative abundance of organisms was selected according to the log-normal distribution.
-
-This was performed using the `data_simulation/generate_copy_numbers.py` script.
 
 ### Read Simulation
 
@@ -32,7 +29,7 @@ For the plasmids the abundance of the host taxa was multipled by the copy number
 
 `art_illumina` in MSv3 mode with 250bp PE reads at an overall coverage of 1x was used to simulated the actual read data.
 
-This was performed using the `data_simluation/simulate_metagenome.py` script
+This and the previous steps were performed using the `data_simluation/simulate_metagenome.py` script
 
 ## Metagenome Assembled Genome Pipeline
 
