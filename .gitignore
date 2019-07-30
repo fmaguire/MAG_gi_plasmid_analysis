@@ -102,3 +102,14 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# large data files
+data/sequences
+*.fq.gz
+*.fna.gz
+*.fq
+*.fa
+*.fna
+*.bam
+*.bai
+old/
