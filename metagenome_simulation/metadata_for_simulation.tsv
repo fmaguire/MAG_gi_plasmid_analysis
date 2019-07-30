@@ -1,0 +1,96 @@
+taxa	sample	accession	seq_type	copy_number	copy_regime
+Mycobacterium gilvum	SAMN02598346	NC_009338	chromosome	4	chromosome
+Mycobacterium gilvum	SAMN02598346	NC_009339	plasmid	26	medium
+Mycobacterium gilvum	SAMN02598346	NC_009340	plasmid	5	low
+Mycobacterium gilvum	SAMN02598346	NC_009341	plasmid	4	low
+Shigella dysenteriae	SAMN02603600	NC_007606	chromosome	1	chromosome
+Shigella dysenteriae	SAMN02603600	NC_009344	plasmid	500	high
+Shigella dysenteriae	SAMN02603600	NC_007607	plasmid	530	high
+Shigella flexneri	SAMN02603599	NC_004337	chromosome	7	chromosome
+Shigella flexneri	SAMN02603599	NC_004851	plasmid	31	medium
+Campylobacter subantarcticus	SAMN03248548	NZ_CP007772	chromosome	28	chromosome
+Pseudomonas syringae group genomosp. 3	SAMN02604017	NC_004578	chromosome	55	chromosome
+Pseudomonas syringae group genomosp. 3	SAMN02604017	NC_004633	plasmid	5	low
+Pseudomonas syringae group genomosp. 3	SAMN02604017	NC_004632	plasmid	20	medium
+Bordetella petrii	SAMEA3138272	NC_010170	chromosome	128	chromosome
+Streptococcus macedonicus	SAMEA2272145	NC_016749	chromosome	1	chromosome
+Streptococcus macedonicus	SAMEA2272145	NC_016750	plasmid	1	low
+Lactobacillus fermentum	SAMD00060917	NC_010610	chromosome	1	chromosome
+Streptococcus constellatus	SAMN02603657	NC_022236	chromosome	1	chromosome
+Acetobacter pasteurianus	SAMN06855882	NZ_CP022374	chromosome	1	chromosome
+Synechococcus sp. PCC 8807	SAMN04422305	NZ_CP016483	chromosome	1	chromosome
+Synechococcus sp. PCC 8807	SAMN04422305	NZ_CP016484	plasmid	5	low
+Synechococcus sp. PCC 8807	SAMN04422305	NZ_CP016485	plasmid	4	low
+Synechococcus sp. PCC 8807	SAMN04422305	NZ_CP016486	plasmid	2	low
+Synechococcus sp. PCC 8807	SAMN04422305	NZ_CP016487	plasmid	500	high
+Synechococcus sp. PCC 8807	SAMN04422305	NZ_CP016488	plasmid	2	low
+Synechococcus sp. PCC 8807	SAMN04422305	NZ_CP016489	plasmid	34	medium
+Erwinia sp. Ejp617	SAMN02603467	NC_017445	chromosome	71	chromosome
+Erwinia sp. Ejp617	SAMN02603467	NC_017442	plasmid	24	medium
+Erwinia sp. Ejp617	SAMN02603467	NC_017446	plasmid	20	medium
+Erwinia sp. Ejp617	SAMN02603467	NC_017443	plasmid	636	high
+Erwinia sp. Ejp617	SAMN02603467	NC_017447	plasmid	24	medium
+Erwinia sp. Ejp617	SAMN02603467	NC_017444	plasmid	594	high
+Bacillus thuringiensis	SAMN02598265	NC_005957	chromosome	11	chromosome
+Bacillus thuringiensis	SAMN02598265	NC_006578	plasmid	6	low
+Acinetobacter soli	SAMN05554081	NZ_CP016896	chromosome	1	chromosome
+Acinetobacter soli	SAMN05554081	NZ_CP016897	plasmid	41	medium
+Acinetobacter soli	SAMN05554081	NZ_CP016898	plasmid	5	low
+Acinetobacter soli	SAMN05554081	NZ_CP016899	plasmid	910	high
+Acinetobacter soli	SAMN05554081	NZ_CP016900	plasmid	20	medium
+Acinetobacter soli	SAMN05554081	NZ_CP016901	plasmid	20	medium
+Acinetobacter soli	SAMN05554081	NZ_CP016902	plasmid	40	medium
+Acinetobacter soli	SAMN05554081	NZ_CP016903	plasmid	75	medium
+Lactobacillus paracollinoides	SAMN04505735	NZ_CP014912	chromosome	1	chromosome
+Lactobacillus paracollinoides	SAMN04505735	NZ_CP014913	plasmid	4	low
+Lactobacillus paracollinoides	SAMN04505735	NZ_CP014914	plasmid	589	high
+Moraxella osloensis	SAMN04435858	NZ_CP014234	chromosome	10	chromosome
+Moraxella osloensis	SAMN04435858	NZ_CP014238	plasmid	8	low
+Moraxella osloensis	SAMN04435858	NZ_CP014237	plasmid	5	low
+Moraxella osloensis	SAMN04435858	NZ_CP014236	plasmid	938	high
+Moraxella osloensis	SAMN04435858	NZ_CP014235	plasmid	41	medium
+Lactobacillus backii	SAMN04505726	NZ_CP014623	chromosome	45	chromosome
+Lactobacillus backii	SAMN04505726	NZ_CP014624	plasmid	34	medium
+Lactobacillus backii	SAMN04505726	NZ_CP014625	plasmid	36	medium
+Lactobacillus backii	SAMN04505726	NZ_CP014626	plasmid	2	low
+Lactobacillus backii	SAMN04505726	NZ_CP014627	plasmid	4	low
+Lactobacillus backii	SAMN04505726	NZ_CP014628	plasmid	1	low
+Lactobacillus backii	SAMN04505726	NZ_CP014629	plasmid	2	low
+Lactobacillus backii	SAMN04505726	NZ_CP014630	plasmid	20	medium
+Lactobacillus backii	SAMN04505726	NZ_CP014631	plasmid	24	medium
+Lactobacillus backii	SAMN04505726	NZ_CP014632	plasmid	673	high
+Lactobacillus backii	SAMN04505726	NZ_CP014633	plasmid	20	medium
+Klebsiella oxytoca	SAMN02786843	NZ_CP008788	chromosome	1	chromosome
+Klebsiella oxytoca	SAMN02786843	NZ_CP008789	plasmid	5	low
+Klebsiella oxytoca	SAMN02786843	NZ_CP008790	plasmid	1	low
+Klebsiella oxytoca	SAMN02786843	NZ_CP008791	plasmid	2	low
+Methylobacterium nodulans	SAMN00000043	NC_011894	chromosome	2	chromosome
+Methylobacterium nodulans	SAMN00000043	NC_011892	plasmid	37	medium
+Methylobacterium nodulans	SAMN00000043	NC_011887	plasmid	3	low
+Methylobacterium nodulans	SAMN00000043	NC_011893	plasmid	500	high
+Methylobacterium nodulans	SAMN00000043	NC_011895	plasmid	1000	high
+Methylobacterium nodulans	SAMN00000043	NC_011888	plasmid	2	low
+Methylobacterium nodulans	SAMN00000043	NC_011889	plasmid	8	low
+Methylobacterium nodulans	SAMN00000043	NC_011890	plasmid	3	low
+Pelagibaca abyssi	SAMN04562614	NZ_CP015093	chromosome	1	chromosome
+Pelagibaca abyssi	SAMN04562614	NZ_CP015091	plasmid	28	medium
+Pelagibaca abyssi	SAMN04562614	NZ_CP015090	plasmid	773	high
+Pelagibaca abyssi	SAMN04562614	NZ_CP015092	plasmid	2	low
+Pelagibaca abyssi	SAMN04562614	NZ_CP015095	plasmid	500	high
+Pelagibaca abyssi	SAMN04562614	NZ_CP015089	plasmid	40	medium
+Pelagibaca abyssi	SAMN04562614	NZ_CP015094	plasmid	1	low
+Pelagibaca abyssi	SAMN04562614	NZ_CP015097	plasmid	7	low
+Pelagibaca abyssi	SAMN04562614	NZ_CP015096	plasmid	500	high
+Paenibacillus bovis	SAMN04193493	NZ_CP013023	chromosome	5	chromosome
+Paenibacillus bovis	SAMN04193493	NZ_CP021170	plasmid	662	high
+Caulobacter segnis	SAMN02598513	NC_014100	chromosome	1	chromosome
+Pedobacter steynii	SAMN05582931	NZ_CP017141	chromosome	1	chromosome
+Actinomyces sp. Marseille-P2985	SAMEA4555081	NZ_LT635457	chromosome	1	chromosome
+Streptococcus sp. I-G2	SAMN02299294	NC_022584	chromosome	1	chromosome
+Streptomyces parvulus	SAMN04924834	NZ_CP015866	chromosome	7	chromosome
+Streptomyces parvulus	SAMN04924834	NZ_CP015867	plasmid	1	low
+Chlamydia pneumoniae	SAMN02602979	NC_005043	chromosome	1	chromosome
+Lactobacillus acidophilus	SAMN02603047	NC_006814	chromosome	129	chromosome
+Clostridium baratii	SAMN03222823	NZ_CP006905	chromosome	12	chromosome
+Clostridium baratii	SAMN03222823	NZ_CP006906	plasmid	1	low
+Akkermansia muciniphila	SAMN00138213	NC_010655	chromosome	3	chromosome
