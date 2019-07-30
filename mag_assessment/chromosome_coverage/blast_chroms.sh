@@ -30,7 +30,7 @@ for binning_tool in maxbin2 metabat2 concoct dastool; do
         echo
       
         for bin in "${bins[@]}"; do
-            blastn -query $bin -db all_chroms -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen qcovs" -out ${binning_tool}/${assembly}/$(basename $bin)_chroms.out6
+            blastn -query $bin -num_hits 1 -db all_chroms -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen qcovs" -out ${binning_tool}/${assembly}/$(basename $bin)_chroms.out6
         done
 
         for bin_hits in ${binning_tool}/${assembly}/*_chroms.out6

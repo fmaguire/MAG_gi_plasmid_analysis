@@ -17,7 +17,7 @@ for binning_tool in maxbin2 metabat2 concoct dastool; do
       
         for bin in "${bins[@]}"; do
             bin_name=$(echo $bin | sed 's/\.nhr//')
-            blastn -query all_plasmids.fna -db $bin_name -outfmt "5 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen qcovs" -out ${binning_tool}/${assembly}/$(basename $bin_name)_plasmids.out6
+            blastn -query all_plasmids.fna -db $bin_name -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen qcovs" -out ${binning_tool}/${assembly}/$(basename $bin_name)_plasmids.out6
         done
 
         for bin_hits in ${binning_tool}/${assembly}/*_plasmids.out6
