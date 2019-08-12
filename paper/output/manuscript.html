@@ -1,0 +1,4184 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-CA" xml:lang="en-CA">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Finlay Maguire*" />
+  <meta name="author" content="Baofeng Jia*" />
+  <meta name="author" content="Kristen Gray" />
+  <meta name="author" content="Venus Lau" />
+  <meta name="author" content="Robert G. Beiko" />
+  <meta name="author" content="Fiona S.L. Brinkman" />
+  <meta name="dcterms.date" content="2019-08-12" />
+  <meta name="keywords" content="markdown, publishing, manubot" />
+  <title>Metagenome-Assembled Genome Binning Methods Disproportionately Fail for Plasmids and Genomic Islands</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Metagenome-Assembled Genome Binning Methods Disproportionately Fail for Plasmids and Genomic Islands</h1>
+</header>
+<p><small><em> This manuscript was automatically generated on August 12, 2019. </em></small></p>
+<h2 id="authors">Authors</h2>
+<p>Please note the current author order is chronological and does not reflect the final order.</p>
+<ul>
+<li><p><strong>Finlay Maguire</strong>*<br> <img src="images/orcid.svg" class="inline_icon" alt="ORCID icon" /> <a href="https://orcid.org/0000-0002-1203-9514">0000-0002-1203-9514</a> · <img src="images/github.svg" class="inline_icon" alt="GitHub icon" /> <a href="https://github.com/fmaguire">fmaguire</a> · <img src="images/twitter.svg" class="inline_icon" alt="Twitter icon" /> <a href="https://twitter.com/fmaguire">fmaguire</a><br> <small> Faculty of Computer Science, Dalhousie University · Funded by [‘Genome Canada’, ‘Donald Hill Family Fellowship’] </small></p></li>
+<li><p><strong>Baofeng Jia</strong>*<br> <img src="images/orcid.svg" class="inline_icon" alt="ORCID icon" /> <a href="https://orcid.org/XXXX-XXXX-XXXX-XXXX">XXXX-XXXX-XXXX-XXXX</a> · <img src="images/github.svg" class="inline_icon" alt="GitHub icon" /> <a href="https://github.com/imasianxd">imasianxd</a><br> <small> Department of Biochemistry and Molecular Biology, Simon Fraser University </small></p></li>
+<li><p><strong>Kristen Gray</strong><br> <img src="images/orcid.svg" class="inline_icon" alt="ORCID icon" /> <a href="https://orcid.org/XXXX-XXXX-XXXX-XXXX">XXXX-XXXX-XXXX-XXXX</a><br> <small> Department of Biochemistry and Molecular Biology, Simon Fraser University </small></p></li>
+<li><p><strong>Venus Lau</strong><br> <img src="images/orcid.svg" class="inline_icon" alt="ORCID icon" /> <a href="https://orcid.org/XXXX-XXXX-XXXX-XXXX">XXXX-XXXX-XXXX-XXXX</a><br> <small> Department of Biochemistry and Molecular Biology, Simon Fraser University </small></p></li>
+<li><p><strong>Robert G. Beiko</strong><br><br> <small> Faculty of Computer Science, Dalhousie University </small></p></li>
+<li><p><strong>Fiona S.L. Brinkman</strong><br> <img src="images/orcid.svg" class="inline_icon" alt="ORCID icon" /> <a href="https://orcid.org/XXXX-XXXX-XXXX-XXXX">XXXX-XXXX-XXXX-XXXX</a><br> <small> Department of Biochemistry and Molecular Biology, Simon Fraser University </small></p></li>
+</ul>
+<h2 id="abstract">Abstract</h2>
+<p><strong>final numbers to add</strong></p>
+<p>Metagenomic methods, in which all the DNA in sample is simultanously sequenced, is an increasingly popular method in the life sciences. They have a major advantage over genomic or phenotypic methods as they do not require time-intensive and bias-inducing culturing steps. This means a much greater diversity can be profiled with minimal <em>a priori</em> assumptions. Due to this strength, metagenomics is emerging as a key tool in public health microbiology for surveillance of virulence and antimicrobial resistance (AMR) genes. The most important sequences for surveillance purposes are those associated with mobile genetic elements such as plasmids and genomic islands (GIs). Unfortunately, metagenomic data, even when assembled, results in complex mixed set of DNA fragments rather than nicely resolved individual genomes. Recently, methods have been developed that attempt to group these fragments into bins likely to have been derived from the same underlying genome. These bins are commonly known as metagenome-assembled genomes (MAGs). MAG based approaches have been used to great effect in revealing huge amounts of previously uncharacterised microbial diversity. These methods perform this grouping using aspects of the sequence composition and the relative abundance of that sequence in the dataset. Unfortunately, plasmids are often represented at different copy numbers than the corresponding chromosomes. Additionally, both plasmids and genomic islands often feature significantly different sequence composition than the rest of the source genome as a whole. Due to this we hypothesise these types of sequences will be highly under-represented in MAG based approaches.</p>
+<p>To evaluate this we generated a simulated metagenomic dataset comprised of genomes with large numbers of plasmids and considerable proportion of chrosomomal DNA consisting of GIs at varying relative abundances. MAGs were then recovered from this data using a variety of different established MAG pipelines and parameterisations and correct binning of plasmid and GI sequences calculated relative to the genomes as a whole. We show that regardless of the MAG approach used, plasmid and GI dominated sequences will systematically be left unbinned or incorrectly binned. This indicates the importance of read based approaches for thorough evalaution of resistome complements in metagenomic data.</p>
+<h2 id="intro">Introduction</h2>
+<p>Metagenomics, the untargeted sequencing of all DNA within a sample, has become the dominant approach for characterising viral and microbial communities over the last 17 years <span class="citation" data-cites="8PLOeAH6 7RV1Ygsv">[<a href="#ref-8PLOeAH6" role="doc-biblioref">1</a>,<a href="#ref-7RV1Ygsv" role="doc-biblioref">2</a>]</span>. By targeting all genomic content these methods allow researchers to profile the functional potential and the taxonomic composition of a sample. This is in contrast to barcoding based approaches such as 16S or 18S rRNA sequencing which only provide taxonomic information <span class="citation" data-cites="Trbw5ZnC">[<a href="#ref-Trbw5ZnC" role="doc-biblioref">3</a>]</span> (although you can attempt to predict functional potential from taxonomic data <span class="citation" data-cites="93ojQnSg L09Dmaq3">[<a href="#ref-93ojQnSg" role="doc-biblioref">4</a>,<a href="#ref-L09Dmaq3" role="doc-biblioref">5</a>]</span>). One of many areas where metagenomics has been very useful is in the analysis of antimicrobial resistance (AMR). Using these approaches has been instrumental in developing our understanding of the distribution and evolutionary history of AMR genes <span class="citation" data-cites="rwhLEYRY QSe5BqFk 2xaXclNM">[<a href="#ref-rwhLEYRY" role="doc-biblioref">6</a>,<a href="#ref-QSe5BqFk" role="doc-biblioref">7</a>,<a href="#ref-2xaXclNM" role="doc-biblioref">8</a>]</span>. It has also formed a very useful tool for pathogen tracking in public health outbreak analyses <span class="citation" data-cites="khJQfjDf">[<a href="#ref-khJQfjDf" role="doc-biblioref">9</a>]</span></p>
+<p>While 3rd generation long-read technology has begun to be adopted in metagenomics analyses <span class="citation" data-cites="U4vhNZoB 1759XyDVi">[<a href="#ref-U4vhNZoB" role="doc-biblioref">10</a>,<a href="#ref-1759XyDVi" role="doc-biblioref">11</a>]</span> the majority of analyses still involve high-throughput 2nd generation sequencing. These 2nd generation platforms such as Illumina’s MiSeq provide high numbers (10s-100s of millions) of relatively short reads (150-250bp) randomly sampled from the underlying DNA in the sample. This sampling is therefore in proportion to the relative abundance of different organisms (i.e. more abundant organisms will be more represented in the reads). There are 2 main approaches to the analysis of 2nd generation metagenomic data: read homology and metagenome assembly. Read-based approaches involve using reference databases and BLAST based sequence similarity search tools (e.g. DIAMOND <span class="citation" data-cites="4R96QRcV">[<a href="#ref-4R96QRcV" role="doc-biblioref">12</a>]</span>), read mapping (e.g. Bowtie 2 <span class="citation" data-cites="PiS0h6Mu">[<a href="#ref-PiS0h6Mu" role="doc-biblioref">13</a>]</span>), Hidden Markov Models (e.g. HMMER3 <span class="citation" data-cites="77xWEk9S">[<a href="#ref-77xWEk9S" role="doc-biblioref">14</a>]</span>) or k-mer hashing (e.g. CLARK <span class="citation" data-cites="OoKZ0WcH">[<a href="#ref-OoKZ0WcH" role="doc-biblioref">15</a>]</span>). These read-based approaches allow analysis of all reads with detectable similarity to the genes you are interested even if the organism is relatively under-represented in the dataset. However, read-based methods are reliant on quality of the reference database (i.e. you don’t detect things you don’t already know about) and does not provide any information about the genomic organisation of the genes.</p>
+<p>In order to get more data about the relative genomic context and organisation of your genes of interest it is possible (although computationally demanding) to assemble the short reads into longer fragments of DNA (contigs). This approach has been used successfully in even very early metagenomic analysis papers <span class="citation" data-cites="F7RexqdF">[<a href="#ref-F7RexqdF" role="doc-biblioref">16</a>]</span>. There are a variety of specialised de Bruijn graph assemblers developed to handle the particular challenges of this type of assembly (such as metaSPAdes <span class="citation" data-cites="KP5SjPXN">[<a href="#ref-KP5SjPXN" role="doc-biblioref">17</a>]</span> , IDBA-UD <span class="citation" data-cites="a4mT7fuU">[<a href="#ref-a4mT7fuU" role="doc-biblioref">18</a>]</span>, and megahit <span class="citation" data-cites="1EUV0Ejkr">[<a href="#ref-1EUV0Ejkr" role="doc-biblioref">19</a>]</span>) each with a range of different strengths and weaknesses <span class="citation" data-cites="f0X2CPKM">[<a href="#ref-f0X2CPKM" role="doc-biblioref">20</a>]</span>. While metagenomic assembly does provide longer stretches of DNA incorporating information about multiple genes without further analysis it still leaves you with a large collection of DNA fragments with no obvious groupings.</p>
+<p>An increasingly common way to deal with this is to attempt to group these assembled contigs into bins all derived from the same underlying genome in the sample. These resulting bins are known as metagenome assembled genomes (MAGs). This binning is typically performed by grouping all the contigs with similar abundance and similar sequence composition into the same bin. A range of tools have been released to perform this binning including CONCOCT <span class="citation" data-cites="WRoCf6pg">[<a href="#ref-WRoCf6pg" role="doc-biblioref">21</a>]</span>, MetaBAT 2 <span class="citation" data-cites="b2WO18xh">[<a href="#ref-b2WO18xh" role="doc-biblioref">22</a>]</span>, and MaxBin 2 <span class="citation" data-cites="sG4CX8Uj">[<a href="#ref-sG4CX8Uj" role="doc-biblioref">23</a>]</span>. There is also the metabinning tool DAS Tool <span class="citation" data-cites="DfIRBmdF">[<a href="#ref-DfIRBmdF" role="doc-biblioref">24</a>]</span> which combines predictions from multiple binning tools together. These MAG approaches have been used to great effect in unveiling huge amounts of previously uncharacterised genomic diversity <span class="citation" data-cites="4rsFboY4 wrBRBdFb Rk2NATlI">[<a href="#ref-4rsFboY4" role="doc-biblioref">25</a>,<a href="#ref-wrBRBdFb" role="doc-biblioref">26</a>,<a href="#ref-Rk2NATlI" role="doc-biblioref">27</a>]</span>.</p>
+<p>Unfortunately, only a relatively small proportion of reads are successfully assembled and binned in large complex metagenome datasets e.g. 24.2-36.4% of reads from permafrost <span class="citation" data-cites="buqrbdBh">[<a href="#ref-buqrbdBh" role="doc-biblioref">28</a>]</span> and soil metagenomes <span class="citation" data-cites="d5Hh0941">[<a href="#ref-d5Hh0941" role="doc-biblioref">29</a>]</span>. Additionally, a large number of detected genomes are not reconstructed at all with only ~23% of all detected genomes recovered in the soil metagenome <span class="citation" data-cites="d5Hh0941">[<a href="#ref-d5Hh0941" role="doc-biblioref">29</a>]</span>. There have been attempts to benchmark and compare these tools such as the Critical Assessment of Metagenome Interpretation (CAMI) challenge’s (https://data.cami-challenge.org/) Assessment of Metagenome BinnERs (AMBER) <span class="citation" data-cites="Y8sHlHi">[<a href="#ref-Y8sHlHi" role="doc-biblioref">30</a>]</span> however these only investigate the completeness and purity of recovered MAGs relative to true genomes in the sample. They don’t attempt to assess whether there are specific components of the underlying genomes that are disproportionately lost. Two such genomic elements of great importance to the study and lateral gene transfer of AMR are genomic islands and plasmid sequences.</p>
+<p>Genomic islands (GIs) are clusters of genes known or predicted to have been acquired through lateral gene transfer (LGT) events. These include integrons, transposons, integrative and conjugative elements (ICEs) and prophages (integrated phages) <span class="citation" data-cites="DET3tBYj 1Af4oXwEX">[<a href="#ref-DET3tBYj" role="doc-biblioref">31</a>,<a href="#ref-1Af4oXwEX" role="doc-biblioref">32</a>]</span>. They have been shown to disproportionately encode virulence factors <span class="citation" data-cites="LxGqo7iq">[<a href="#ref-LxGqo7iq" role="doc-biblioref">33</a>]</span> and are a major mechanism of LGT of AMR genes <span class="citation" data-cites="x7HhCKyS 17U91060Y">[<a href="#ref-x7HhCKyS" role="doc-biblioref">34</a>,<a href="#ref-17U91060Y" role="doc-biblioref">35</a>]</span>. However, these GIs often have different nucleotide composition compared to the rest of the genome <span class="citation" data-cites="DET3tBYj">[<a href="#ref-DET3tBYj" role="doc-biblioref">31</a>]</span>, which is exploited by tools such as SIGI-HMM <span class="citation" data-cites="19UeQywMr">[<a href="#ref-19UeQywMr" role="doc-biblioref">36</a>]</span> and IslandPath-DIMOB <span class="citation" data-cites="M1pdcdMy">[<a href="#ref-M1pdcdMy" role="doc-biblioref">37</a>]</span> to detect GIs. Additionally, GIs may exist as multiple copies within a genome <span class="citation" data-cites="5g9Xc4ot">[<a href="#ref-5g9Xc4ot" role="doc-biblioref">38</a>]</span> leading to potential difficulties in correctly assembling these regions in metagenome assemblies as well as likely biases in the calculation of coverage statistics. Similarly, plasmids are a major source of the dissemination and transistion of AMR genes throughout microbial ecosystems <span class="citation" data-cites="X9j9vETu x7HhCKyS">[<a href="#ref-x7HhCKyS" role="doc-biblioref">34</a>,<a href="#ref-X9j9vETu" role="doc-biblioref">39</a>]</span>. They also exist at variable copy number <span class="citation" data-cites="qtpTcNWp Z1irb7eF">[<a href="#ref-qtpTcNWp" role="doc-biblioref">40</a>,<a href="#ref-Z1irb7eF" role="doc-biblioref">41</a>]</span> and with markedly different sequence composition to the genome they are associated with <span class="citation" data-cites="QK9dmRUA ps1aOiRU">[<a href="#ref-QK9dmRUA" role="doc-biblioref">42</a>,<a href="#ref-ps1aOiRU" role="doc-biblioref">43</a>]</span></p>
+<p>As MAG binning is performed on the basis of sequence composition and coverage this suggests that these sequences are liable to being incorrectly binned or lost in the process of recovering MAGs. Due to the importance of these genomic components in the function and spread of pathogenic traits such as AMR and virulence it is vital that we assess the impact of assembly and binning on the representation of these elements. This is particularly important with the increasing popularity of MAG approaches within microbial and public health research. Therefore, to address this issue we performed an analysis of GI and plasmid recovery accuracy across a range of assembly and binning approaches using a simulated medium complexity metagenome comprised of GI and plasmid rich taxa.</p>
+<h2 id="methods">Materials and Methods</h2>
+<p>All analyses presented in this paper can be reproduced and inspected using the Jupyter (version XX) [citation] notebook (.ipynb) within the associated github repository (https://github.com/fmaguire/MAG_gi_plasmid_analysis). The specific code version used for this paper is also archived under DOI:XXXYYY.</p>
+<h3 id="metagenome-simulation">Metagenome Simulation</h3>
+<p>All genomes were selected from the set of completed RefSeq genomes as of April 2019.<br />
+Genomic islands for these genomes were previously predicted using IslandPath-DIMOB <span class="citation" data-cites="M1pdcdMy">[<a href="#ref-M1pdcdMy" role="doc-biblioref">37</a>]</span> and collated into the IslandViewer database (http://www.pathogenomics.sfu.ca/islandviewer) <span class="citation" data-cites="4eEyIkDg">[<a href="#ref-4eEyIkDg" role="doc-biblioref">44</a>]</span>. Plasmid sequences and numbers were recovered for each genome using the linked genbank Project IDs.</p>
+<p>30 genomes were arbitrarily chosen to exemplify the following criteria: - 10 with high numbers of plasmids - 10 with a very high proportion (&gt;X%) of chromosomes corresponding to composition detected GIs. - 10 with a very low proportion (&lt;Y%) of chromosomes corresponding to composition detected GIs.</p>
+<p>The data used to select the taxa is listed in Supplemental Table 1 and the details of the selected subset taxa are listed in Supplemental Table 2 with their NCBI accessions. The sequences themselves are in <code>data/sequences/sequences.tar.bz2</code></p>
+<p>In accordance to the recommendation in the CAMI challenge <span class="citation" data-cites="lsbnKJf8">[<a href="#ref-lsbnKJf8" role="doc-biblioref">45</a>]</span> the genomes were randomly assigned a relative abundance following a log-normal distribituion (= 1, = 2). Plasmid copy number estimates could not be accurately found for all organisms, therefore, plasmids were randomly assigned a copy number regime: low (1-20), medium (20-100), or high (500-1000) at a 2:1:1 rate. Within each regime the exact copy number was selected using an appropriately scaled gamma distribution (= 4, = 1) or the minimum edge of the regime. Finally, the effective plasmid relative abundance was determined by multiplying the plasmid copy number with the genome relative abundance. The full set of randomly assigned relative abundances and copy numbers can be found in Supplemental Table 3.</p>
+<p>Sequences were then concatenated into a single fasta file with the appropriate relative abudance. MiSeq v3 250bp paired-end reads with a mean fragment length of 1000bp (standard deviation of 50bp) were then simulated using art_illumina (v2016.06.05) <span class="citation" data-cites="znONJtTo">[<a href="#ref-znONJtTo" role="doc-biblioref">46</a>]</span> at a fold coverage of 2.9 resulting in a simulate metagenome of 31,174,411 read pairs.</p>
+<p>The selection of relative abundance and metagenome simulation itself was performed using the <code>data_simluation/simulate_metagenome.py</code> script.</p>
+<h3 id="metagenome-assembled-genome-recovery">Metagenome Assembled Genome Recovery</h3>
+<p>Reads were trimmed using sickle (v1.33) <span class="citation" data-cites="1CBlSILo4">[<a href="#ref-1CBlSILo4" role="doc-biblioref">47</a>]</span> resulting in 25,682,644 surviving read pairs. The trimmed reads were then assembled using 3 different metagenomic assemblers: metaSPAdes (v3.13.0)<span class="citation" data-cites="KP5SjPXN">[<a href="#ref-KP5SjPXN" role="doc-biblioref">17</a>]</span> , IDBA-UD (v1.1.3) <span class="citation" data-cites="a4mT7fuU">[<a href="#ref-a4mT7fuU" role="doc-biblioref">18</a>]</span>, and megahit (v1.1.3) <span class="citation" data-cites="1EUV0Ejkr">[<a href="#ref-1EUV0Ejkr" role="doc-biblioref">19</a>]</span>). The resulting assemblies were summarised using metaQUAST (v5.0.2) <span class="citation" data-cites="TeRvtMCl">[<a href="#ref-TeRvtMCl" role="doc-biblioref">48</a>]</span>. The assemblies were indexed and reads mapped back using Bowtie 2 (v2.3.4.3) <span class="citation" data-cites="PiS0h6Mu">[<a href="#ref-PiS0h6Mu" role="doc-biblioref">13</a>]</span>.</p>
+<p>Samtools (v1.9) were then used to sort the read mappings and the read coverage calculated using the MetaBAT 2 accessory script (jgi_summarize_bam_contig_depths. The 3 metagenome assemblies were then separately binned using CONCOCT (v0.4.2) <span class="citation" data-cites="WRoCf6pg">[<a href="#ref-WRoCf6pg" role="doc-biblioref">21</a>]</span>, MetaBAT 2 (v2.13) <span class="citation" data-cites="b2WO18xh">[<a href="#ref-b2WO18xh" role="doc-biblioref">22</a>]</span>, and MaxBin 2 (v2.2.6) <span class="citation" data-cites="sG4CX8Uj">[<a href="#ref-sG4CX8Uj" role="doc-biblioref">23</a>]</span>. As per the specified manual instructions CONCOCT used a slightly different approach to estimate read coverage. The supplied accessory scripts were also used to cut contigs into 10 kilobase fragments (cut_up_fasta.py) and read coverage calculated for the fragments (concoct_coverage_table.py). These fragment coverages were then used to bin the 10kb fragments before the clustered fragments were merged (merge_cutup_clustering.py) to create the final CONCOCT MAG bins (extra_fasta_bins.py) Finally, for each metagenome assembly the predicted bins from these 3 binners were combined using DAS Tool (v1.1.1) <span class="citation" data-cites="DfIRBmdF">[<a href="#ref-DfIRBmdF" role="doc-biblioref">24</a>]</span>. This resulted in 12 separate sets of MAGs (one set for each assembler and binner pair).</p>
+<h3 id="mag-assessment">MAG assessment</h3>
+<h4 id="chromosomal-coverage">Chromosomal Coverage</h4>
+<p>The MAG assessment for chromosomal coverage was performed by creating a BLASTN 2.9.0+ <span class="citation" data-cites="nEsJGUWa">[<a href="#ref-nEsJGUWa" role="doc-biblioref">49</a>]</span> database consisting of all the chromosomes of the input reference genomes. Each MAG contig was then used as a query against this database and the coverage of the underlying chromosomes tallied by merging the overlapping aligning regions and summing the total length of aligned MAG contigs. The most represented genome in each MAG was assigned as the “identity” of that MAG for further analyses. Coverages less than 5% were filtered out and the number of different genomes that a MAG contain contigs aligning to were tallied. Finally, the overall proportion of chromosomes that were not present in any MAG were tallied for each binner and assembler.</p>
+<h4 id="plasmid-and-gi-coverage">Plasmid and GI Coverage</h4>
+<p>Plasmid and GI coverage were assessed in the same way as one another. Firstly, each a BLASTN database was generated for each set of MAG contigs. Then each MAG database was searched for plasmid and GI sequences. Any plasmid or GI with greater than 50% coverage in a MAG was retained. All plasmids or GIs which could be found in the unbinned contigs or the MAGs was recorded as having been successfully assembled. The subset of these which were found in the binned MAGs was then seperately tallied. Finally, we evaluated the proportion of plasmids or GIs which were binned correctly in the bin which was maximally composed of chromosomes from the same source gneome. This was determined using the bin “IDs” from the chromosomal coverage analysis.</p>
+<h2 id="results">Results</h2>
+<p>The overall ability of MAG methods to recapitulate the original chromosomal source genome results varied widely. We consider the identity of a given MAG bin to be that of the genome that composes the largest proportion of sequence within that bin. In other words if a bin is identifiably 70% species A and 30% species B we consider that to be a bin of species A. Ideally, we wish to generate a single bin for each source genome comprised of the entire genome and no contigs from other genomes. Some genomes are cleanly and accurately binned regardless of the assembler and binning method used (See Fig. (<a href="#fig:supspeciescov">6</a>)). Specifically, greater than 90% of <em>Streptomyces parvulus</em> (minimum 91.8%) and <em>Clostridium baratii</em> (minimum 96.4%) chromosomes are represented in individual bins across all methods. However, no other genomes were consistently recovered by all methods for more than a 3rd of the chromosomes. The 3 <em>Streptococcus</em> genomes were particularly problematic, likely due to their similarity, with the best recovery for each ranging from 1.7% to 47.49%.</p>
+<figure>
+<img src="images/s1_species_top_coverage.png" id="fig:supspeciescov" alt="" /><figcaption><span>Figure 1:</span> Top Species Coverage</figcaption>
+</figure>
+<p>In terms of assembler, megahit resulted in the highest median chromosomal coverage across all binners (81.9%) with metaSPAdes performing worst (76.8%) (see Fig. (<a href="#fig:1topcoverage">2</a>)). In terms of binning tool, CONCOCT performed very poorly with a median 26% coverage for top hit per bin, followed by maxbin2 (83.1%), and metabat2 (88.5%). It is perhaps unsuprising that the best performing binner in terms of bin top hit coverage was the metabinner DAS-TOOL that combines predictions from the other 3 binners (94.3% median top hit chromosome coverage per bin, (<a href="#fig:1topcoverage">2</a>)).</p>
+<figure>
+<img src="images/1a_top_coverage.png" id="fig:1topcoverage" alt="" /><figcaption><span>Figure 2:</span> Chromosomal coverages of most prevalent genome in each bin across binners and metagenome assemblies</figcaption>
+</figure>
+<p>Bin purity, i.e. the number of genomes present in a bin at &gt;5% coverage, was largely equivalent across assemblers (see Fig. (<a href="#fig:1purity">3</a>)), with a very marginally higher purity for IDBA. In terms of binning tool, however, maxbin2 proved an outlier with nearly twice as many bins containing multiple species as the next binner. The remaining binning tools were largely equivalent, producing chimeric bins at approximately the same rates.</p>
+<figure>
+<img src="images/1b_purity.png" id="fig:1purity" alt="" /><figcaption><span>Figure 3:</span> Distribution of bin purities. Showing the number of genomes with &gt;5% chromosomal coverage across the bins and methods</figcaption>
+</figure>
+<p>Regardless of method, a very small proportion of plasmids were correctly binned in the bin that mostly contained chromosomal contigs from the same source genome. Specifically, between 1.5% (IDBA-UD assembly with DAS Tool bins) and 29.2% (metaSPAdes with CONCOCT bins) were correctly binned at over 50% coverage. In terms of metagenome assembly MetaSPAdes was far and away the most successful assembler at assembling plasmids with 66.2% of plasmids identifiable at greater than 50% coverage. IDBA-UD performed worst with 17.1% of plasmids recovered, and megahit recovered 36.9%. If the plasmid was successfully assembled it was placed in a bin by maxbin2 and CONCOCT, although a much smaller fraction correctly binned (typically less than 1/3rd). Interestingly, metabat2 and DAS tool binners were a lot more conservative in assigning plasmid contigs to bins, however, of those assigned to bins nearly all were correctly binned (see Fig. (<a href="#fig:2plasmids">4</a>)).</p>
+<figure>
+<img src="images/2_plasmid_coverage.png" id="fig:2plasmids" alt="" /><figcaption><span>Figure 4:</span> Plasmid Coverage</figcaption>
+</figure>
+<p>GIs displayed a similar pattern of assembly and correct binning performance as plasmids (see Fig. (<a href="#fig:3gis">5</a>)). These sequences were assembled uniformly badly (37.8-44.1%) with metaSPAdes outperforming the other two assembly approaches. For CONCOCT and maxbin2 binning tools all GIs that were assembled were assigned to a bin although the proportion of binned GIs that were correctly binned was lower than for DAS Tool and metabat2. DAS Tool, metabat2 and CONCOCT didn’t display the same precipitious drop-off between those assembled and those correctly binned as was observed for plasmids. In terms of overall correct binning with the chromosomes from the same genome the metaSPAdes assembly with CONCOCT (44.1%) and maxbin2 (43.3%) binners performed best.</p>
+<figure>
+<img src="images/3_gi_coverage.png" id="fig:3gis" alt="" /><figcaption><span>Figure 5:</span> Genomic Island Coverage</figcaption>
+</figure>
+<h2 id="discussion">Discussion</h2>
+<ul>
+<li><p>CONCOCT seems to display a trend of generating lots of small partial bins</p></li>
+<li><p>Correct binning didn’t assess uniqueness, i.e. CONCOCT may have performed well relatively in some of the GI/Plasmid binning analysis by non-redundantly binning</p></li>
+<li><p>The problems of plasmid assembly is well known and Plasmid assembly might perform better using a specific plasmid assembler <span class="citation" data-cites="12zFifp5x">[<a href="#ref-12zFifp5x" role="doc-biblioref">50</a>]</span>.</p></li>
+<li><p>Justin GI/Plasmid AMR context numbers?</p></li>
+<li><p>The drop-off in correct binning suggests binning plasmids is harder than GIs.</p></li>
+<li><p>This might be to do with plasmids having overall more divergent composition features relative to chromosomes.</p></li>
+<li><p>Interestingly GIs were apparently harder to assemble than plasmids</p></li>
+</ul>
+<h2 id="conclusions">Conclusions</h2>
+<ul>
+<li>Plasmids and GIs are difficult to recover in metagenome assemblies.</li>
+<li>Even if they are recovered they are disproportionately binned incorrectly</li>
+<li>Clinically important AMR genes and virulence factors are found in these mobile genetic elements.</li>
+<li>This has severe implications for the study of antimicrobial resistance and AMR using MAGs.</li>
+</ul>
+<h2 id="supplementals">Supplementals</h2>
+<figure>
+<img src="images/s1_species_top_coverage.png" id="fig:supspeciescov" alt="" /><figcaption><span>Figure 6:</span> Top Species Coverage</figcaption>
+</figure>
+<div id="refs" class="references" role="doc-bibliography">
+<div id="ref-8PLOeAH6">
+<p>1. <strong>Genomic analysis of uncultured marine viral communities</strong><br />
+M. Breitbart, P. Salamon, B. Andresen, J. M. Mahaffy, A. M. Segall, D. Mead, F. Azam, F. Rohwer<br />
+<em>Proceedings of the National Academy of Sciences</em> (2002-10-16) <a href="https://doi.org/br7jq3">https://doi.org/br7jq3</a><br />
+DOI: <a href="https://doi.org/10.1073/pnas.202488399">10.1073/pnas.202488399</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/12384570">12384570</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC137870">PMC137870</a></p>
+</div>
+<div id="ref-7RV1Ygsv">
+<p>2. <strong>Shotgun metagenomics, from sampling to analysis</strong><br />
+Christopher Quince, Alan W Walker, Jared T Simpson, Nicholas J Loman, Nicola Segata<br />
+<em>Nature Biotechnology</em> (2017-09) <a href="https://doi.org/gbv6nf">https://doi.org/gbv6nf</a><br />
+DOI: <a href="https://doi.org/10.1038/nbt.3935">10.1038/nbt.3935</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/28898207">28898207</a></p>
+</div>
+<div id="ref-Trbw5ZnC">
+<p>3. <strong>Analysis of a marine picoplankton community by 16S rRNA gene cloning and sequencing.</strong><br />
+TM Schmidt, EF DeLong, NR Pace<br />
+<em>Journal of bacteriology</em> (1991-07) <a href="https://www.ncbi.nlm.nih.gov/pubmed/2066334">https://www.ncbi.nlm.nih.gov/pubmed/2066334</a><br />
+DOI: <a href="https://doi.org/10.1128/jb.173.14.4371-4378.1991">10.1128/jb.173.14.4371-4378.1991</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/2066334">2066334</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC208098">PMC208098</a></p>
+</div>
+<div id="ref-93ojQnSg">
+<p>4. <strong>Predictive functional profiling of microbial communities using 16S rRNA marker gene sequences</strong><br />
+Morgan GI Langille, Jesse Zaneveld, J Gregory Caporaso, Daniel McDonald, Dan Knights, Joshua A Reyes, Jose C Clemente, Deron E Burkepile, Rebecca L Vega Thurber, Rob Knight, … Curtis Huttenhower<br />
+<em>Nature Biotechnology</em> (2013-08-25) <a href="https://doi.org/f49xzd">https://doi.org/f49xzd</a><br />
+DOI: <a href="https://doi.org/10.1038/nbt.2676">10.1038/nbt.2676</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/23975157">23975157</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3819121">PMC3819121</a></p>
+</div>
+<div id="ref-L09Dmaq3">
+<p>5. <strong>PICRUSt2: An improved and extensible approach for metagenome inference</strong><br />
+Gavin M. Douglas, Vincent J. Maffei, Jesse Zaneveld, Svetlana N. Yurgel, James R. Brown, Christopher M. Taylor, Curtis Huttenhower, Morgan G. I. Langille<br />
+<em>Cold Spring Harbor Laboratory</em> (2019-06-15) <a href="https://doi.org/gf5ffb">https://doi.org/gf5ffb</a><br />
+DOI: <a href="https://doi.org/10.1101/672295">10.1101/672295</a></p>
+</div>
+<div id="ref-rwhLEYRY">
+<p>6. <strong>A Systematic Analysis of Biosynthetic Gene Clusters in the Human Microbiome Reveals a Common Family of Antibiotics</strong><br />
+Mohamed S. Donia, Peter Cimermancic, Christopher J. Schulze, Laura C. Wieland Brown, John Martin, Makedonka Mitreva, Jon Clardy, Roger G. Linington, Michael A. Fischbach<br />
+<em>Cell</em> (2014-09) <a href="https://doi.org/f6k3fg">https://doi.org/f6k3fg</a><br />
+DOI: <a href="https://doi.org/10.1016/j.cell.2014.08.032">10.1016/j.cell.2014.08.032</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/25215495">25215495</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4164201">PMC4164201</a></p>
+</div>
+<div id="ref-QSe5BqFk">
+<p>7. <strong>Expanding the soil antibiotic resistome: exploring environmental diversity</strong><br />
+Vanessa M D’Costa, Emma Griffiths, Gerard D Wright<br />
+<em>Current Opinion in Microbiology</em> (2007-10) <a href="https://doi.org/cfbpjj">https://doi.org/cfbpjj</a><br />
+DOI: <a href="https://doi.org/10.1016/j.mib.2007.08.009">10.1016/j.mib.2007.08.009</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/17951101">17951101</a></p>
+</div>
+<div id="ref-2xaXclNM">
+<p>8. <strong>Antibiotic resistance is ancient</strong><br />
+Vanessa M. D’Costa, Christine E. King, Lindsay Kalan, Mariya Morar, Wilson W. L. Sung, Carsten Schwarz, Duane Froese, Grant Zazula, Fabrice Calmels, Regis Debruyne, … Gerard D. Wright<br />
+<em>Nature</em> (2011-08-31) <a href="https://doi.org/b3wbvx">https://doi.org/b3wbvx</a><br />
+DOI: <a href="https://doi.org/10.1038/nature10388">10.1038/nature10388</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/21881561">21881561</a></p>
+</div>
+<div id="ref-khJQfjDf">
+<p>9. <strong>A Culture-Independent Sequence-Based Metagenomics Approach to the Investigation of an Outbreak of Shiga-Toxigenic Escherichia coli O104:H4</strong><br />
+Nicholas J. Loman, Chrystala Constantinidou, Martin Christner, Holger Rohde, Jacqueline Z.-M. Chan, Joshua Quick, Jacqueline C. Weir, Christopher Quince, Geoffrey P. Smith, Jason R. Betley, … Mark J. Pallen<br />
+<em>JAMA</em> (2013-04-10) <a href="https://doi.org/f5rqft">https://doi.org/f5rqft</a><br />
+DOI: <a href="https://doi.org/10.1001/jama.2013.3231">10.1001/jama.2013.3231</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/23571589">23571589</a></p>
+</div>
+<div id="ref-U4vhNZoB">
+<p>10. <strong>Ultra-deep, long-read nanopore sequencing of mock microbial community standards</strong><br />
+Samuel M Nicholls, Joshua C Quick, Shuiquan Tang, Nicholas J Loman<br />
+<em>GigaScience</em> (2019-05-01) <a href="https://doi.org/gf39g3">https://doi.org/gf39g3</a><br />
+DOI: <a href="https://doi.org/10.1093/gigascience/giz043">10.1093/gigascience/giz043</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/31089679">31089679</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6520541">PMC6520541</a></p>
+</div>
+<div id="ref-1759XyDVi">
+<p>11. <strong>Long-read based de novo assembly of low-complexity metagenome samples results in finished genomes and reveals insights into strain diversity and an active phage system</strong><br />
+Vincent Somerville, Stefanie Lutz, Michael Schmid, Daniel Frei, Aline Moser, Stefan Irmler, Jürg E. Frey, Christian H. Ahrens<br />
+<em>BMC Microbiology</em> (2019-06-25) <a href="https://doi.org/gf5ffc">https://doi.org/gf5ffc</a><br />
+DOI: <a href="https://doi.org/10.1186/s12866-019-1500-0">10.1186/s12866-019-1500-0</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/31238873">31238873</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6593500">PMC6593500</a></p>
+</div>
+<div id="ref-4R96QRcV">
+<p>12. <strong>Fast and sensitive protein alignment using DIAMOND</strong><br />
+Benjamin Buchfink, Chao Xie, Daniel H Huson<br />
+<em>Nature Methods</em> (2014-11-17) <a href="https://doi.org/gftzcs">https://doi.org/gftzcs</a><br />
+DOI: <a href="https://doi.org/10.1038/nmeth.3176">10.1038/nmeth.3176</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/25402007">25402007</a></p>
+</div>
+<div id="ref-PiS0h6Mu">
+<p>13. <strong>Fast gapped-read alignment with Bowtie 2</strong><br />
+Ben Langmead, Steven L Salzberg<br />
+<em>Nature Methods</em> (2012-03-04) <a href="https://doi.org/gd2xzn">https://doi.org/gd2xzn</a><br />
+DOI: <a href="https://doi.org/10.1038/nmeth.1923">10.1038/nmeth.1923</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/22388286">22388286</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3322381">PMC3322381</a></p>
+</div>
+<div id="ref-77xWEk9S">
+<p>14. <strong>nhmmer: DNA homology search with profile HMMs</strong><br />
+T. J. Wheeler, S. R. Eddy<br />
+<em>Bioinformatics</em> (2013-07-09) <a href="https://doi.org/f5xm9x">https://doi.org/f5xm9x</a><br />
+DOI: <a href="https://doi.org/10.1093/bioinformatics/btt403">10.1093/bioinformatics/btt403</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/23842809">23842809</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3777106">PMC3777106</a></p>
+</div>
+<div id="ref-OoKZ0WcH">
+<p>15. <strong>CLARK: fast and accurate classification of metagenomic and genomic sequences using discriminative k-mers</strong><br />
+Rachid Ounit, Steve Wanamaker, Timothy J Close, Stefano Lonardi<br />
+<em>BMC Genomics</em> (2015-03-25) <a href="https://doi.org/gb3h2t">https://doi.org/gb3h2t</a><br />
+DOI: <a href="https://doi.org/10.1186/s12864-015-1419-2">10.1186/s12864-015-1419-2</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/25879410">25879410</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4428112">PMC4428112</a></p>
+</div>
+<div id="ref-F7RexqdF">
+<p>16. <strong>Community structure and metabolism through reconstruction of microbial genomes from the environment</strong><br />
+Gene W. Tyson, Jarrod Chapman, Philip Hugenholtz, Eric E. Allen, Rachna J. Ram, Paul M. Richardson, Victor V. Solovyev, Edward M. Rubin, Daniel S. Rokhsar, Jillian F. Banfield<br />
+<em>Nature</em> (2004-02-01) <a href="https://doi.org/b85j5j">https://doi.org/b85j5j</a><br />
+DOI: <a href="https://doi.org/10.1038/nature02340">10.1038/nature02340</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/14961025">14961025</a></p>
+</div>
+<div id="ref-KP5SjPXN">
+<p>17. <strong>metaSPAdes: a new versatile metagenomic assembler</strong><br />
+Sergey Nurk, Dmitry Meleshko, Anton Korobeynikov, Pavel A. Pevzner<br />
+<em>Genome Research</em> (2017-03-15) <a href="https://doi.org/f97jkv">https://doi.org/f97jkv</a><br />
+DOI: <a href="https://doi.org/10.1101/gr.213959.116">10.1101/gr.213959.116</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/28298430">28298430</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5411777">PMC5411777</a></p>
+</div>
+<div id="ref-a4mT7fuU">
+<p>18. <strong>IDBA-UD: a de novo assembler for single-cell and metagenomic sequencing data with highly uneven depth</strong><br />
+Y. Peng, H. C. M. Leung, S. M. Yiu, F. Y. L. Chin<br />
+<em>Bioinformatics</em> (2012-04-11) <a href="https://doi.org/f3z7hv">https://doi.org/f3z7hv</a><br />
+DOI: <a href="https://doi.org/10.1093/bioinformatics/bts174">10.1093/bioinformatics/bts174</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/22495754">22495754</a></p>
+</div>
+<div id="ref-1EUV0Ejkr">
+<p>19. <strong>MEGAHIT: an ultra-fast single-node solution for large and complex metagenomics assembly via succinct de Bruijn graph</strong><br />
+Dinghua Li, Chi-Man Liu, Ruibang Luo, Kunihiko Sadakane, Tak-Wah Lam<br />
+<em>Bioinformatics</em> (2015-01-20) <a href="https://doi.org/f7fb5z">https://doi.org/f7fb5z</a><br />
+DOI: <a href="https://doi.org/10.1093/bioinformatics/btv033">10.1093/bioinformatics/btv033</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/25609793">25609793</a></p>
+</div>
+<div id="ref-f0X2CPKM">
+<p>20. <strong>Assembling metagenomes, one community at a time</strong><br />
+Andries Johannes van der Walt, Marc Warwick van Goethem, Jean-Baptiste Ramond, Thulani Peter Makhalanyane, Oleg Reva, Don Arthur Cowan<br />
+<em>BMC Genomics</em> (2017-07-10) <a href="https://doi.org/gf5fhs">https://doi.org/gf5fhs</a><br />
+DOI: <a href="https://doi.org/10.1186/s12864-017-3918-9">10.1186/s12864-017-3918-9</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/28693474">28693474</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5502489">PMC5502489</a></p>
+</div>
+<div id="ref-WRoCf6pg">
+<p>21. <strong>COCACOLA: binning metagenomic contigs using sequence COmposition, read CoverAge, CO-alignment and paired-end read LinkAge</strong><br />
+Yang Young Lu, Ting Chen, Jed A. Fuhrman, Fengzhu Sun<br />
+<em>Bioinformatics</em> (2016-06-02) <a href="https://doi.org/f9x7sc">https://doi.org/f9x7sc</a><br />
+DOI: <a href="https://doi.org/10.1093/bioinformatics/btw290">10.1093/bioinformatics/btw290</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/27256312">27256312</a></p>
+</div>
+<div id="ref-b2WO18xh">
+<p>22. <strong>MetaBAT 2: an adaptive binning algorithm for robust and efficient genome reconstruction from metagenome assemblies</strong><br />
+Dongwan Kang, Feng Li, Edward S Kirton, Ashleigh Thomas, Rob S Egan, Hong An, Zhong Wang<br />
+<em>PeerJ</em> (2019-02-06) <a href="https://doi.org/gf5fhv">https://doi.org/gf5fhv</a><br />
+DOI: <a href="https://doi.org/10.7287/peerj.preprints.27522v1">10.7287/peerj.preprints.27522v1</a></p>
+</div>
+<div id="ref-sG4CX8Uj">
+<p>23. <strong>MaxBin 2.0: an automated binning algorithm to recover genomes from multiple metagenomic datasets</strong><br />
+Yu-Wei Wu, Blake A. Simmons, Steven W. Singer<br />
+<em>Bioinformatics</em> (2015-10-29) <a href="https://doi.org/f8c9n2">https://doi.org/f8c9n2</a><br />
+DOI: <a href="https://doi.org/10.1093/bioinformatics/btv638">10.1093/bioinformatics/btv638</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/26515820">26515820</a></p>
+</div>
+<div id="ref-DfIRBmdF">
+<p>24. <strong>Recovery of genomes from metagenomes via a dereplication, aggregation and scoring strategy</strong><br />
+Christian M. K. Sieber, Alexander J. Probst, Allison Sharrar, Brian C. Thomas, Matthias Hess, Susannah G. Tringe, Jillian F. Banfield<br />
+<em>Nature Microbiology</em> (2018-05-28) <a href="https://doi.org/gfwwfg">https://doi.org/gfwwfg</a><br />
+DOI: <a href="https://doi.org/10.1038/s41564-018-0171-1">10.1038/s41564-018-0171-1</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/29807988">29807988</a></p>
+</div>
+<div id="ref-4rsFboY4">
+<p>25. <strong>Unusual biology across a group comprising more than 15% of domain Bacteria</strong><br />
+Christopher T. Brown, Laura A. Hug, Brian C. Thomas, Itai Sharon, Cindy J. Castelle, Andrea Singh, Michael J. Wilkins, Kelly C. Wrighton, Kenneth H. Williams, Jillian F. Banfield<br />
+<em>Nature</em> (2015-06-15) <a href="https://doi.org/f7h5xj">https://doi.org/f7h5xj</a><br />
+DOI: <a href="https://doi.org/10.1038/nature14486">10.1038/nature14486</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/26083755">26083755</a></p>
+</div>
+<div id="ref-wrBRBdFb">
+<p>26. <strong>Recovery of nearly 8,000 metagenome-assembled genomes substantially expands the tree of life</strong><br />
+Donovan H. Parks, Christian Rinke, Maria Chuvochina, Pierre-Alain Chaumeil, Ben J. Woodcroft, Paul N. Evans, Philip Hugenholtz, Gene W. Tyson<br />
+<em>Nature Microbiology</em> (2017-09-11) <a href="https://doi.org/cczd">https://doi.org/cczd</a><br />
+DOI: <a href="https://doi.org/10.1038/s41564-017-0012-7">10.1038/s41564-017-0012-7</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/28894102">28894102</a></p>
+</div>
+<div id="ref-Rk2NATlI">
+<p>27. <strong>The genomic and proteomic landscape of the rumen microbiome revealed by comprehensive genome-resolved metagenomics</strong><br />
+Robert D. Stewart, Marc D. Auffret, Amanda Warr, Alan W. Walker, Rainer Roehe, Mick Watson<br />
+<em>Cold Spring Harbor Laboratory</em> (2018-12-08) <a href="https://doi.org/gf5fhr">https://doi.org/gf5fhr</a><br />
+DOI: <a href="https://doi.org/10.1101/489443">10.1101/489443</a></p>
+</div>
+<div id="ref-buqrbdBh">
+<p>28. <strong>Genome-centric view of carbon processing in thawing permafrost</strong><br />
+Ben J. Woodcroft, Caitlin M. Singleton, Joel A. Boyd, Paul N. Evans, Joanne B. Emerson, Ahmed A. F. Zayed, Robert D. Hoelzle, Timothy O. Lamberton, Carmody K. McCalley, Suzanne B. Hodgkins, … Gene W. Tyson<br />
+<em>Nature</em> (2018-07-16) <a href="https://doi.org/gdth6p">https://doi.org/gdth6p</a><br />
+DOI: <a href="https://doi.org/10.1038/s41586-018-0338-1">10.1038/s41586-018-0338-1</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/30013118">30013118</a></p>
+</div>
+<div id="ref-d5Hh0941">
+<p>29. <strong>Mediterranean grassland soil C–N compound turnover is dependent on rainfall and depth, and is mediated by genomically divergent microorganisms</strong><br />
+Spencer Diamond, Peter F. Andeer, Zhou Li, Alexander Crits-Christoph, David Burstein, Karthik Anantharaman, Katherine R. Lane, Brian C. Thomas, Chongle Pan, Trent R. Northen, Jillian F. Banfield<br />
+<em>Nature Microbiology</em> (2019-05-20) <a href="https://doi.org/gf5fcx">https://doi.org/gf5fcx</a><br />
+DOI: <a href="https://doi.org/10.1038/s41564-019-0449-y">10.1038/s41564-019-0449-y</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/31110364">31110364</a></p>
+</div>
+<div id="ref-Y8sHlHi">
+<p>30. <strong>AMBER: Assessment of Metagenome BinnERs</strong><br />
+Fernando Meyer, Peter Hofmann, Peter Belmann, Ruben Garrido-Oter, Adrian Fritz, Alexander Sczyrba, Alice C McHardy<br />
+<em>GigaScience</em> (2018-06-01) <a href="https://doi.org/gdptz9">https://doi.org/gdptz9</a><br />
+DOI: <a href="https://doi.org/10.1093/gigascience/giy069">10.1093/gigascience/giy069</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/29893851">29893851</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6022608">PMC6022608</a></p>
+</div>
+<div id="ref-DET3tBYj">
+<p>31. <strong>Detecting genomic islands using bioinformatics approaches</strong><br />
+Morgan G. I. Langille, William W. L. Hsiao, Fiona S. L. Brinkman<br />
+<em>Nature Reviews Microbiology</em> (2010-05) <a href="https://doi.org/d6ss55">https://doi.org/d6ss55</a><br />
+DOI: <a href="https://doi.org/10.1038/nrmicro2350">10.1038/nrmicro2350</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/20395967">20395967</a></p>
+</div>
+<div id="ref-1Af4oXwEX">
+<p>32. <strong>Horizontal gene transfer: building the web of life</strong><br />
+Shannon M. Soucy, Jinling Huang, Johann Peter Gogarten<br />
+<em>Nature Reviews Genetics</em> (2015-07-17) <a href="https://doi.org/f7j3d9">https://doi.org/f7j3d9</a><br />
+DOI: <a href="https://doi.org/10.1038/nrg3962">10.1038/nrg3962</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/26184597">26184597</a></p>
+</div>
+<div id="ref-LxGqo7iq">
+<p>33. <strong>The Association of Virulence Factors with Genomic Islands</strong><br />
+Shannan J. Ho Sui, Amber Fedynak, William W. L. Hsiao, Morgan G. I. Langille, Fiona S. L. Brinkman<br />
+<em>PLoS ONE</em> (2009-12-01) <a href="https://doi.org/c7hsvv">https://doi.org/c7hsvv</a><br />
+DOI: <a href="https://doi.org/10.1371/journal.pone.0008094">10.1371/journal.pone.0008094</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/19956607">19956607</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2779486">PMC2779486</a></p>
+</div>
+<div id="ref-x7HhCKyS">
+<p>34. <strong>Dissemination of Antimicrobial Resistance in Microbial Ecosystems through Horizontal Gene Transfer</strong><br />
+Christian J. H. von Wintersdorff, John Penders, Julius M. van Niekerk, Nathan D. Mills, Snehali Majumder, Lieke B. van Alphen, Paul H. M. Savelkoul, Petra F. G. Wolffs<br />
+<em>Frontiers in Microbiology</em> (2016-02-19) <a href="https://doi.org/gf5fht">https://doi.org/gf5fht</a><br />
+DOI: <a href="https://doi.org/10.3389/fmicb.2016.00173">10.3389/fmicb.2016.00173</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/26925045">26925045</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4759269">PMC4759269</a></p>
+</div>
+<div id="ref-17U91060Y">
+<p>35. <strong>Transfer of antibiotic-resistance genes via phage-related mobile elements</strong><br />
+Maryury Brown-Jaque, William Calero-Cáceres, Maite Muniesa<br />
+<em>Plasmid</em> (2015-05) <a href="https://doi.org/f7dvxv">https://doi.org/f7dvxv</a><br />
+DOI: <a href="https://doi.org/10.1016/j.plasmid.2015.01.001">10.1016/j.plasmid.2015.01.001</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/25597519">25597519</a></p>
+</div>
+<div id="ref-19UeQywMr">
+<p>36. <br />
+Rainer Merkl<br />
+<em>BMC Bioinformatics</em> (2004) <a href="https://doi.org/bt5x8h">https://doi.org/bt5x8h</a><br />
+DOI: <a href="https://doi.org/10.1186/1471-2105-5-22">10.1186/1471-2105-5-22</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/15113412">15113412</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC394314">PMC394314</a></p>
+</div>
+<div id="ref-M1pdcdMy">
+<p>37. <strong>Improved genomic island predictions with IslandPath-DIMOB</strong><br />
+Claire Bertelli, Fiona SL Brinkman<br />
+<em>Bioinformatics</em> (2018-02-23) <a href="https://doi.org/gdphgs">https://doi.org/gdphgs</a><br />
+DOI: <a href="https://doi.org/10.1093/bioinformatics/bty095">10.1093/bioinformatics/bty095</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/29905770">29905770</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6022643">PMC6022643</a></p>
+</div>
+<div id="ref-5g9Xc4ot">
+<p>38. <strong>Microbial genomic island discovery, visualization and analysis</strong><br />
+Claire Bertelli, Keith E Tilley, Fiona SL Brinkman<br />
+<em>Briefings in Bioinformatics</em> (2018-06-03) <a href="https://doi.org/gdnhfv">https://doi.org/gdnhfv</a><br />
+DOI: <a href="https://doi.org/10.1093/bib/bby042">10.1093/bib/bby042</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/29868902">29868902</a></p>
+</div>
+<div id="ref-X9j9vETu">
+<p>39. <strong>Understanding the mechanisms and drivers of antimicrobial resistance.</strong><br />
+Alison H Holmes, Luke SP Moore, Arnfinn Sundsfjord, Martin Steinbakk, Sadie Regmi, Abhilasha Karkey, Philippe J Guerin, Laura JV Piddock<br />
+<em>Lancet (London, England)</em> (2015-11-18) <a href="https://www.ncbi.nlm.nih.gov/pubmed/26603922">https://www.ncbi.nlm.nih.gov/pubmed/26603922</a><br />
+DOI: <a href="https://doi.org/10.1016/s0140-6736(15)00473-0">10.1016/s0140-6736(15)00473-0</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/26603922">26603922</a></p>
+</div>
+<div id="ref-qtpTcNWp">
+<p>40. <strong>Multicopy plasmids potentiate the evolution of antibiotic resistance in bacteria</strong><br />
+Alvaro San Millan, Jose Antonio Escudero, Danna R. Gifford, Didier Mazel, R. Craig MacLean<br />
+<em>Nature Ecology &amp; Evolution</em> (2016-11-07) <a href="https://doi.org/bs76">https://doi.org/bs76</a><br />
+DOI: <a href="https://doi.org/10.1038/s41559-016-0010">10.1038/s41559-016-0010</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/28812563">28812563</a></p>
+</div>
+<div id="ref-Z1irb7eF">
+<p>41. <strong>Small-Plasmid-Mediated Antibiotic Resistance Is Enhanced by Increases in Plasmid Copy Number and Bacterial Fitness</strong><br />
+Alvaro San Millan, Alfonso Santos-Lopez, Rafael Ortega-Huedo, Cristina Bernabe-Balas, Sean P. Kennedy, Bruno Gonzalez-Zorn<br />
+<em>Antimicrobial Agents and Chemotherapy</em> (2015-03-30) <a href="https://doi.org/f7k8bk">https://doi.org/f7k8bk</a><br />
+DOI: <a href="https://doi.org/10.1128/aac.00235-15">10.1128/aac.00235-15</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/25824216">25824216</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4432117">PMC4432117</a></p>
+</div>
+<div id="ref-QK9dmRUA">
+<p>42. <strong>cBar: a computer program to distinguish plasmid-derived from chromosome-derived sequence fragments in metagenomics data</strong><br />
+Fengfeng Zhou, Ying Xu<br />
+<em>Bioinformatics</em> (2010-08-02) <a href="https://doi.org/cn7486">https://doi.org/cn7486</a><br />
+DOI: <a href="https://doi.org/10.1093/bioinformatics/btq299">10.1093/bioinformatics/btq299</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/20538725">20538725</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2916713">PMC2916713</a></p>
+</div>
+<div id="ref-ps1aOiRU">
+<p>43. <strong>Modal Codon Usage: Assessing the Typical Codon Usage of a Genome</strong><br />
+J. J. Davis, G. J. Olsen<br />
+<em>Molecular Biology and Evolution</em> (2009-12-17) <a href="https://doi.org/bhsmq5">https://doi.org/bhsmq5</a><br />
+DOI: <a href="https://doi.org/10.1093/molbev/msp281">10.1093/molbev/msp281</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/20018979">20018979</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2839124">PMC2839124</a></p>
+</div>
+<div id="ref-4eEyIkDg">
+<p>44. <strong>IslandViewer 3: more flexible, interactive genomic island discovery, visualization and analysis: Figure 1.</strong><br />
+Bhavjinder K. Dhillon, Matthew R. Laird, Julie A. Shay, Geoffrey L. Winsor, Raymond Lo, Fazmin Nizam, Sheldon K. Pereira, Nicholas Waglechner, Andrew G. McArthur, Morgan G. I. Langille, Fiona S. L. Brinkman<br />
+<em>Nucleic Acids Research</em> (2015-04-27) <a href="https://doi.org/f7n2xs">https://doi.org/f7n2xs</a><br />
+DOI: <a href="https://doi.org/10.1093/nar/gkv401">10.1093/nar/gkv401</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/25916842">25916842</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4489224">PMC4489224</a></p>
+</div>
+<div id="ref-lsbnKJf8">
+<p>45. <strong>Critical Assessment of Metagenome Interpretation—a benchmark of metagenomics software</strong><br />
+Alexander Sczyrba, Peter Hofmann, Peter Belmann, David Koslicki, Stefan Janssen, Johannes Dröge, Ivan Gregor, Stephan Majda, Jessika Fiedler, Eik Dahms, … Alice C McHardy<br />
+<em>Nature Methods</em> (2017-10-02) <a href="https://doi.org/gbzspt">https://doi.org/gbzspt</a><br />
+DOI: <a href="https://doi.org/10.1038/nmeth.4458">10.1038/nmeth.4458</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/28967888">28967888</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5903868">PMC5903868</a></p>
+</div>
+<div id="ref-znONJtTo">
+<p>46. <strong>ART: a next-generation sequencing read simulator</strong><br />
+Weichun Huang, Leping Li, Jason R. Myers, Gabor T. Marth<br />
+<em>Bioinformatics</em> (2011-12-23) <a href="https://doi.org/fzf84c">https://doi.org/fzf84c</a><br />
+DOI: <a href="https://doi.org/10.1093/bioinformatics/btr708">10.1093/bioinformatics/btr708</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/22199392">22199392</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3278762">PMC3278762</a></p>
+</div>
+<div id="ref-1CBlSILo4">
+<p>47. <strong>Sickle: A sliding-window, adaptive, quality-based trimming tool for FastQ files</strong><br />
+NA Joshi, JN Fass<br />
+<em>GitHub</em> (2011) <a href="https://github.com/najoshi/sickle">https://github.com/najoshi/sickle</a></p>
+</div>
+<div id="ref-TeRvtMCl">
+<p>48. <strong>MetaQUAST: evaluation of metagenome assemblies</strong><br />
+Alla Mikheenko, Vladislav Saveliev, Alexey Gurevich<br />
+<em>Bioinformatics</em> (2015-11-26) <a href="https://doi.org/f8jdjj">https://doi.org/f8jdjj</a><br />
+DOI: <a href="https://doi.org/10.1093/bioinformatics/btv697">10.1093/bioinformatics/btv697</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/26614127">26614127</a></p>
+</div>
+<div id="ref-nEsJGUWa">
+<p>49. <strong>BLAST+: architecture and applications</strong><br />
+Christiam Camacho, George Coulouris, Vahram Avagyan, Ning Ma, Jason Papadopoulos, Kevin Bealer, Thomas L Madden<br />
+<em>BMC Bioinformatics</em> (2009) <a href="https://doi.org/cnjxgz">https://doi.org/cnjxgz</a><br />
+DOI: <a href="https://doi.org/10.1186/1471-2105-10-421">10.1186/1471-2105-10-421</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/20003500">20003500</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2803857">PMC2803857</a></p>
+</div>
+<div id="ref-12zFifp5x">
+<p>50. <strong>On the (im)possibility of reconstructing plasmids from whole-genome short-read sequencing data</strong><br />
+Sergio Arredondo-Alonso, Rob J. Willems, Willem van Schaik, Anita C. Schürch<br />
+<em>Microbial Genomics</em> (2017-10-01) <a href="https://doi.org/gf6b63">https://doi.org/gf6b63</a><br />
+DOI: <a href="https://doi.org/10.1099/mgen.0.000128">10.1099/mgen.0.000128</a> · PMID: <a href="https://www.ncbi.nlm.nih.gov/pubmed/29177087">29177087</a> · PMCID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5695206">PMC5695206</a></p>
+</div>
+</div>
+<!-- default theme -->
+
+<style>
+    /* import google fonts */
+    @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700");
+    @import url("https://fonts.googleapis.com/css?family=Source+Code+Pro");
+
+    /* -------------------------------------------------- */
+    /* global */
+    /* -------------------------------------------------- */
+
+    /* all elements */
+    * {
+        /* force sans-serif font unless specified otherwise */
+        font-family: "Open Sans", "Helvetica", sans-serif;
+
+        /* prevent text inflation on some mobile browsers */
+        -webkit-text-size-adjust: none !important;
+        -moz-text-size-adjust: none !important;
+        -o-text-size-adjust: none !important;
+        text-size-adjust: none !important;
+    }
+
+    @media only screen {
+        /* "page" element */
+        body {
+            position: relative;
+            box-sizing: border-box;
+            font-size: 12pt;
+            line-height: 1.5;
+            max-width: 8.5in;
+            margin: 20px auto;
+            padding: 40px;
+            border-radius: 5px;
+            border: solid 1px #bdbdbd;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            background: #ffffff;
+        }
+    }
+
+    /* when on screen < 8.5in wide */
+    @media only screen and (max-width: 8.5in) {
+        /* "page" element */
+        body {
+            padding: 20px;
+            margin: 0;
+            border-radius: 0;
+            border: none;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05) inset;
+            background: none;
+        }
+    }
+
+    /* -------------------------------------------------- */
+    /* headings */
+    /* -------------------------------------------------- */
+
+    /* all headings */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 20px 0;
+        padding: 0;
+        font-weight: bold;
+    }
+
+    /* biggest heading */
+    h1 {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    /* second biggest heading */
+    h2 {
+        margin-top: 30px;
+        padding-bottom: 5px;
+        border-bottom: solid 1px #bdbdbd;
+    }
+
+    /* -------------------------------------------------- */
+    /* manuscript header */
+    /* -------------------------------------------------- */
+
+    /* manuscript title */
+    header > h1 {
+        margin: 0;
+    }
+
+    /* manuscript title caption text (ie "automatically generated on") */
+    header + p {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    /* -------------------------------------------------- */
+    /* text elements */
+    /* -------------------------------------------------- */
+
+    /* links */
+    a {
+        color: #2196f3;
+    }
+
+    /* normal links (not empty, not button link, not syntax highlighting link) */
+    a:not(:empty):not(.button):not(.sourceLine) {
+        padding-left: 1px;
+        padding-right: 1px;
+    }
+
+    /* superscripts and subscripts */
+    sub,
+    sup {
+        /* prevent from affecting line height */
+        line-height: 0;
+    }
+
+    /* unordered and ordered lists*/
+    ul,
+    ol {
+        padding-left: 20px;
+    }
+
+    /* class for styling text semibold */
+    .semibold {
+        font-weight: 600;
+    }
+
+    /* class for styling elements horizontally left aligned */
+    .left {
+        display: block;
+        text-align: left;
+        margin-left: auto;
+        margin-right: 0;
+        justify-content: left;
+    }
+
+    /* class for styling elements horizontally centered */
+    .center {
+        display: block;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+        justify-content: center;
+    }
+
+    /* class for styling elements horizontally right aligned */
+    .right {
+        display: block;
+        text-align: right;
+        margin-left: 0;
+        margin-right: auto;
+        justify-content: right;
+    }
+
+    /* -------------------------------------------------- */
+    /* section elements */
+    /* -------------------------------------------------- */
+
+    /* horizontal divider line */
+    hr {
+        border: none;
+        height: 1px;
+        background: #bdbdbd;
+    }
+
+    /* paragraphs, horizontal dividers, figures, tables, code */
+    p,
+    hr,
+    figure,
+    table,
+    pre {
+        /* treat all as "paragraphs", with consistent vertical margins */
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    /* -------------------------------------------------- */
+    /* figures */
+    /* -------------------------------------------------- */
+
+    /* figure */
+    figure {
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* figure caption */
+    figcaption {
+        padding: 0;
+        padding-top: 10px;
+    }
+
+    /* figure image element */
+    figure img {
+        max-width: 100%;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* figure auto-number */
+    img + figcaption > span:first-of-type {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+
+    /* -------------------------------------------------- */
+    /* tables */
+    /* -------------------------------------------------- */
+
+    /* table */
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* table cells */
+    th,
+    td {
+        border: solid 1px #bdbdbd;
+        padding: 10px;
+        /* squash table if too wide for page by forcing line breaks */
+        word-break: break-all;
+        word-break: break-word;
+    }
+
+    /* header row and even rows */
+    th,
+    tr:nth-child(2n) {
+        background-color: #fafafa;
+    }
+
+    /* odd rows */
+    tr:nth-child(2n + 1) {
+        background-color: #ffffff;
+    }
+
+    /* table caption */
+    caption {
+        text-align: left;
+        padding: 0;
+        padding-bottom: 10px;
+    }
+
+    /* table auto-number */
+    table > caption > span:first-of-type,
+    div.table_wrapper > table > caption > span:first-of-type {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+
+    /* -------------------------------------------------- */
+    /* code */
+    /* -------------------------------------------------- */
+
+    /* multi-line code block */
+    pre {
+        padding: 10px;
+        background-color: #eeeeee;
+        color: #000000;
+        border-radius: 5px;
+        break-inside: avoid;
+        text-align: left;
+    }
+
+    /* inline code, ie code within normal text */
+    :not(pre) > code {
+        padding: 0 4px;
+        background-color: #eeeeee;
+        color: #000000;
+        border-radius: 5px;
+    }
+
+    /* code text */
+    /* apply all children, to reach syntax highlighting sub-elements */
+    code,
+    code * {
+        /* force monospace font */
+        font-family: "Source Code Pro", "Courier New", monospace;
+    }
+
+    /* -------------------------------------------------- */
+    /* quotes */
+    /* -------------------------------------------------- */
+
+    /* quoted text */
+    blockquote {
+        margin: 0;
+        padding: 0;
+        border-left: 4px solid #bdbdbd;
+        padding-left: 16px;
+        break-inside: avoid;
+    }
+
+    /* -------------------------------------------------- */
+    /* banners */
+    /* -------------------------------------------------- */
+
+    /* info banners */
+    .banner {
+        box-sizing: border-box;
+        display: block;
+        position: relative;
+        width: 100%;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    /* paragraph in banner */
+    .banner > p {
+        margin: 0;
+    }
+
+    /* -------------------------------------------------- */
+    /* highlight colors */
+    /* -------------------------------------------------- */
+
+    .white {
+        background: #ffffff;
+    }
+    .lightgrey {
+        background: #eeeeee;
+    }
+    .grey {
+        background: #757575;
+    }
+    .darkgrey {
+        background: #424242;
+    }
+    .black {
+        background: #000000;
+    }
+    .lightred {
+        background: #ffcdd2;
+    }
+    .lightyellow {
+        background: #ffecb3;
+    }
+    .lightgreen {
+        background: #dcedc8;
+    }
+    .lightblue {
+        background: #e3f2fd;
+    }
+    .lightpurple {
+        background: #f3e5f5;
+    }
+    .red {
+        background: #f44336;
+    }
+    .orange {
+        background: #ff9800;
+    }
+    .yellow {
+        background: #ffeb3b;
+    }
+    .green {
+        background: #4caf50;
+    }
+    .blue {
+        background: #2196f3;
+    }
+    .purple {
+        background: #9c27b0;
+    }
+    .white,
+    .lightgrey,
+    .lightred,
+    .lightyellow,
+    .lightgreen,
+    .lightblue,
+    .lightpurple,
+    .orange,
+    .yellow,
+    .white a,
+    .lightgrey a,
+    .lightred a,
+    .lightyellow a,
+    .lightgreen a,
+    .lightblue a,
+    .lightpurple a,
+    .orange a,
+    .yellow a {
+        color: #000000;
+    }
+    .grey,
+    .darkgrey,
+    .black,
+    .red,
+    .green,
+    .blue,
+    .purple,
+    .grey a,
+    .darkgrey a,
+    .black a,
+    .red a,
+    .green a,
+    .blue a,
+    .purple a {
+        color: #ffffff;
+    }
+
+    /* -------------------------------------------------- */
+    /* buttons */
+    /* -------------------------------------------------- */
+
+    /* class for styling links like buttons */
+    .button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin: 5px;
+        padding: 10px 20px;
+        font-size: 0.75em;
+        font-weight: 600;
+        text-transform: uppercase;
+        text-decoration: none;
+        letter-spacing: 1px;
+        background: none;
+        color: #2196f3;
+        border: solid 1px #bdbdbd;
+        border-radius: 5px;
+    }
+
+    /* buttons when hovered */
+    .button:hover:not([disabled]),
+    .icon_button:hover:not([disabled]) {
+        cursor: pointer;
+        background: #f5f5f5;
+    }
+
+    /* buttons when disabled */
+    .button[disabled],
+    .icon_button[disabled] {
+        opacity: 0.35;
+        pointer-events: none;
+    }
+
+    /* class for styling buttons containg only single icon */
+    .icon_button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        margin: 0;
+        padding: 0;
+        background: none;
+        border-radius: 5px;
+        border: none;
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        min-height: 20px;
+    }
+
+    /* icon button inner svg image */
+    .icon_button > svg {
+        height: 16px;
+    }
+
+    /* -------------------------------------------------- */
+    /* icons */
+    /* -------------------------------------------------- */
+
+    /* class for styling icons inline with text */
+    .inline_icon {
+        height: 1em;
+        position: relative;
+        top: 0.125em;
+    }
+
+    /* -------------------------------------------------- */
+    /* print control */
+    /* -------------------------------------------------- */
+
+    @media print {
+        @page {
+            /* suggested printing margin */
+            margin: 0.5in;
+        }
+
+        /* document and "page" elements */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* "page" element */
+        body {
+            font-size: 11pt !important;
+            line-height: 1.35;
+        }
+
+        /* all headings */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 15px 0;
+        }
+
+        /* heading 1 */
+        h1 {
+            font-size: 1.75em;
+        }
+
+        /* heading 2 */
+        h2 {
+            font-size: 1.25em;
+            margin-top: 0;
+        }
+
+        /* heading 3 */
+        h3 {
+            font-size: 1.10em;
+        }
+
+        /* figures and tables */
+        figure, table {
+            font-size: 0.85em;
+        }
+
+        /* table cells */
+        th,
+        td {
+            padding: 5px;
+        }
+
+        /* shrink font awesome icons */
+        i.fas,
+        i.fab,
+        i.far,
+        i.fal {
+            transform: scale(0.85);
+        }
+
+        /* decrease banner margins */
+        .banner {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+        }
+
+        /* class for centering an element vertically on its own page */
+        .page_center {
+            margin: auto;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            vertical-align: middle;
+            break-before: page;
+            break-after: page;
+        }
+
+        /* always insert a page break before the element */
+        .page_break_before {
+            break-before: page;
+        }
+
+        /* always insert a page break after the element */
+        .page_break_after {
+            break-after: page;
+        }
+
+        /* avoid page break before the element */
+        .page_break_before_avoid {
+            break-before: avoid;
+        }
+
+        /* avoid page break after the element */
+        .page_break_after_avoid {
+            break-after: avoid;
+        }
+
+        /* avoid page break inside the element */
+        .page_break_inside_avoid {
+            break-inside: avoid;
+        }
+    }
+
+    /* -------------------------------------------------- */
+    /* override pandoc css quirks */
+    /* -------------------------------------------------- */
+
+    .sourceCode {
+        /* prevent unsightly overflow in wide code blocks */
+        overflow: auto !important;
+    }
+
+    div.sourceCode {
+        /* prevent background fill on top-most code block  container */
+        background: none !important;
+    }
+
+    .sourceCode * {
+        /* force consistent line spacing */
+        line-height: 1.5 !important;
+    }
+
+    div.sourceCode {
+        /* style code block margins same as <pre> element */
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    /* -------------------------------------------------- */
+    /* mathjax */
+    /* -------------------------------------------------- */
+
+    /* mathjax containers */
+    .math.display > span:not(.MathJax_Preview) {
+        /* turn inline element (no dimensions) into block (allows fixed width and thus scrolling) */
+        display: flex !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        justify-content: center;
+        align-items: center;
+        margin: 0 !important;
+    }
+
+    /* right click menu */
+    .MathJax_Menu {
+        border-radius: 5px !important;
+        border: solid 1px #bdbdbd !important;
+        box-shadow: none !important;
+    }
+
+    /* equation auto-number */
+    span[id^="eq:"] > span.math.display + span {
+        font-weight: 600;
+    }
+
+    /* equation */
+    span[id^="eq:"] > span.math.display > span {
+        /* nudge to make room for equation auto-number */
+        margin-right: 40px !important;
+    }
+
+    /* -------------------------------------------------- */
+    /* table scroll plugin */
+    /* -------------------------------------------------- */
+
+    @media only screen {
+        /* table wrapper */
+        .table_wrapper {
+            /* show scrollbar on tables if necessary to prevent overflow */
+            overflow: auto;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        /* table within table wrapper */
+        .table_wrapper table,
+        .table_wrapper table * {
+            /* don't break table words */
+            word-break: normal !important;
+        }
+
+        .table_wrapper > table {
+            /* move margins from table to table_wrapper to allow margin collapsing */
+            margin: 0;
+        }
+    }
+
+    /* -------------------------------------------------- */
+    /* anchors plugin */
+    /* -------------------------------------------------- */
+
+    @media only screen {
+        /* anchor button */
+        .anchor {
+            opacity: 0;
+            margin-left: 5px;
+        }
+
+        /* anchor buttons within <h2>'s */
+        h2 .anchor {
+            margin-left: 10px;
+        }
+
+        /* anchor buttons when hovered/focused and anything containing an anchor button when hovered */
+        *:hover > .anchor,
+        .anchor:hover,
+        .anchor:focus {
+            opacity: 1;
+        }
+
+        /* anchor button when hovered */
+        .anchor:hover {
+            cursor: pointer;
+        }
+    }
+
+    /* always show anchor button on devices with no mouse/hover ability */
+    @media (hover: none) {
+        .anchor {
+            opacity: 1;
+        }
+    }
+
+    /* always hide anchor button on print */
+    @media only print {
+        .anchor {
+            display: none;
+        }
+    }
+
+    /* -------------------------------------------------- */
+    /* accordion plugin */
+    /* -------------------------------------------------- */
+
+    @media only screen {
+        /* accordion arrow button */
+        .accordion_arrow {
+            margin-right: 10px;
+        }
+
+        /* arrow icon when <h2> data-collapsed attribute true */
+        h2[data-collapsed="true"] > .accordion_arrow > svg {
+            transform: rotate(-90deg);
+        }
+
+        /* all elements (except <h2>'s) when data-collapsed attribute true */
+        *:not(h2)[data-collapsed="true"] {
+            display: none;
+        }
+
+        /* accordion arrow button when hovered and <h2>'s when hovered */
+        .accordion_arrow:hover,
+        h2[data-collapsed="true"]:hover,
+        h2[data-collapsed="false"]:hover {
+            cursor: pointer;
+        }
+    }
+
+    /* always hide accordion arrow button on print */
+    @media only print {
+        .accordion_arrow {
+            display: none;
+        }
+    }
+
+    /* -------------------------------------------------- */
+    /* tooltips plugin */
+    /* -------------------------------------------------- */
+
+    @media only screen {
+        /* tooltip container */
+        #tooltip {
+            position: absolute;
+            width: 50%;
+            min-width: 240px;
+            max-width: 75%;
+            z-index: 1;
+        }
+
+        /* tooltip content */
+        #tooltip_content {
+            margin-bottom: 5px;
+            padding: 20px;
+            border-radius: 5px;
+            border: solid 1px #bdbdbd;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            background: #ffffff;
+            word-break: break-word;
+        }
+
+        /* tooltip copy of paragraphs and figures */
+        #tooltip_content > p,
+        #tooltip_content > figure {
+            margin: 0;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        /* tooltip copy of <img> */
+        #tooltip_content > figure > img {
+            max-height: 260px;
+        }
+
+        /* navigation bar */
+        #tooltip_nav_bar {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* navigation bar previous/next buton */
+        #tooltip_nav_bar > .icon_button {
+            position: relative;
+            top: 3px;
+        }
+
+        /* navigation bar previous button */
+        #tooltip_nav_bar > .icon_button:first-of-type {
+            margin-right: 5px;
+        }
+
+        /* navigation bar next button */
+        #tooltip_nav_bar > .icon_button:last-of-type {
+            margin-left: 5px;
+        }
+    }
+
+    /* always hide tooltip on print */
+    @media only print {
+        #tooltip {
+            display: none;
+        }
+    }
+
+    /* -------------------------------------------------- */
+    /* jump to first plugin */
+    /* -------------------------------------------------- */
+
+    @media only screen {
+        /* jump button */
+        .jump_arrow {
+            position: relative;
+            top: 0.125em;
+            margin-right: 5px;
+        }
+    }
+
+    /* always hide jump button on print */
+    @media only print {
+        .jump_arrow {
+            display: none;
+        }
+    }
+
+    /* -------------------------------------------------- */
+    /* link highlight plugin */
+    /* -------------------------------------------------- */
+
+    @media only screen {
+        /* anything with data-highlighted attribute true */
+        [data-highlighted="true"] {
+            background: #ffeb3b;
+        }
+
+        /* anything with data-selected attribute true */
+        [data-selected="true"] {
+            background: #ff8a65 !important;
+        }
+
+        /* animation definition for glow */
+        @keyframes highlight_glow {
+            0% {
+                background: none;
+            }
+            10% {
+                background: #bbdefb;
+            }
+            100% {
+                background: none;
+            }
+        }
+
+        /* anything with data-glow attribute true */
+        [data-glow="true"] {
+            animation: highlight_glow 2s;
+        }
+    }
+
+    /* -------------------------------------------------- */
+    /* table of contents plugin */
+    /* -------------------------------------------------- */
+
+    @media only screen {
+        /* toc panel */
+        #toc_panel {
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            z-index: 2;
+        }
+
+        /* toc panel when closed */
+        #toc_panel[data-open="false"] {
+            min-width: 60px;
+            width: 60px;
+            height: 60px;
+            border-right: solid 1px #bdbdbd;
+            border-bottom: solid 1px #bdbdbd;
+        }
+
+        /* toc panel when open */
+        #toc_panel[data-open="true"] {
+            min-width: 260px;
+            max-width: 480px;
+            /* keep panel edge consistent distance away from "page" edge */
+            width: calc(((100vw - 8.5in) / 2) - 30px - 40px);
+            bottom: 0;
+            border-right: solid 1px #bdbdbd;
+        }
+
+        /* toc panel header */
+        #toc_header {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            height: 60px;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* toc panel header when hovered */
+        #toc_header:hover {
+            cursor: pointer;
+        }
+
+        /* toc panel header when panel open */
+        #toc_panel[data-open="true"] > #toc_header {
+            border-bottom: solid 1px #bdbdbd;
+        }
+
+        /* toc open/close header button */
+        #toc_button {
+            margin-right: 20px;
+        }
+
+        /* hide toc list and header text when closed */
+        #toc_panel[data-open="false"] > #toc_header > *:not(#toc_button),
+        #toc_panel[data-open="false"] > #toc_list {
+            display: none;
+        }
+
+        /* toc list of entries */
+        #toc_list {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 20px;
+            position: absolute;
+            top: calc(60px + 1px);
+            bottom: 0;
+            overflow: auto;
+        }
+
+        /* toc entry, link to section in document */
+        .toc_link {
+            display: block;
+            padding: 5px;
+            position: relative;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        /* toc entry when hovered or when "viewed" */
+        .toc_link:hover,
+        .toc_link[data-viewing="true"] {
+            background: #f5f5f5;
+        }
+
+        /* toc entry, level 1 indentation */
+        .toc_link[data-level="1"] {
+            margin-left: 0;
+        }
+
+        /* toc entry, level 2 indentation */
+        .toc_link[data-level="2"] {
+            margin-left: 20px;
+        }
+
+        /* toc entry, level 3 indentation */
+        .toc_link[data-level="3"] {
+            margin-left: 40px;
+        }
+
+        /* toc entry, level 4 indentation */
+        .toc_link[data-level="4"] {
+            margin-left: 60px;
+        }
+
+        /* toc entry bullets */
+        #toc_panel[data-bullets="true"] .toc_link[data-level]:before {
+            position: absolute;
+            left: -15px;
+            top: -1px;
+            font-size: 1.5em;
+        }
+
+        /* toc entry, level 2 bullet */
+        #toc_panel[data-bullets="true"] .toc_link[data-level="2"]:before {
+            content: "\2022";
+        }
+
+        /* toc entry, level 3 bullet */
+        #toc_panel[data-bullets="true"] .toc_link[data-level="3"]:before {
+            content: "\25AB";
+        }
+
+        /* toc entry, level 4 bullet */
+        #toc_panel[data-bullets="true"] .toc_link[data-level="4"]:before {
+            content: "-";
+        }
+    }
+
+    /* when on screen < 8.5in wide */
+    @media only screen and (max-width: 8.5in) {
+        /* push <body> ("page") element down to make room for toc icon */
+        .toc_body_nudge {
+            padding-top: 60px;
+        }
+
+        /* toc icon when panel closed and not hovered */
+        #toc_panel[data-open="false"]:not(:hover) {
+            background: rgba(255, 255, 255, 0.75);
+        }
+    }
+
+    /* always hide toc panel on print */
+    @media only print {
+        #toc_panel {
+            display: none;
+        }
+    }
+
+    /* -------------------------------------------------- */
+    /* lightbox plugin */
+    /* -------------------------------------------------- */
+
+    @media only screen {
+        /* regular <img> in document when hovered */
+        .lightbox_document_img:hover {
+            cursor: pointer;
+        }
+
+        .body_no_scroll {
+            overflow: hidden !important;
+        }
+
+        /* screen overlay */
+        #lightbox_overlay {
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 3;
+        }
+
+        /* middle area containing lightbox image */
+        #lightbox_image_container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* bottom area containing caption */
+        #lightbox_bottom_container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+            min-height: 100px;
+            max-height: 100px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* image number info text box */
+        #lightbox_number_info {
+            position: absolute;
+            color: #ffffff;
+            font-weight: 600;
+            left: 2px;
+            top: 0;
+            z-index: 4;
+        }
+
+        /* zoom info text box */
+        #lightbox_zoom_info {
+            position: absolute;
+            color: #ffffff;
+            font-weight: 600;
+            right: 2px;
+            top: 0;
+            z-index: 4;
+        }
+
+        /* copy of image caption */
+        #lightbox_caption {
+            box-sizing: border-box;
+            display: inline-block;
+            width: 100%;
+            max-height: 100%;
+            padding: 10px 0;
+            text-align: center;
+            overflow-y: auto;
+            color: #ffffff;
+        }
+
+        /* navigation previous/next button */
+        .lightbox_button {
+            width: 100px;
+            height: 100%;
+            min-width: 100px;
+            min-height: 100%;
+            color: #ffffff;
+        }
+
+        /* navigation previous/next button when hovered */
+        .lightbox_button:hover {
+            background: none !important;
+        }
+
+        /* navigation button icon */
+        .lightbox_button > svg {
+            height: 25px;
+        }
+
+        /* figure auto-number */
+        #lightbox_caption > span:first-of-type {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* lightbox image when hovered */
+        #lightbox_img:hover {
+            cursor: grab;
+        }
+
+        /* lightbox image when grabbed */
+        #lightbox_img:active {
+            cursor: grabbing;
+        }
+    }
+
+    /* when on screen < 480px wide */
+    @media only screen and (max-width: 480px) {
+        /* make navigation buttons skinnier on small screens to make more room for caption text */
+        .lightbox_button {
+            width: 50px;
+            min-width: 50px;
+        }
+    }
+
+    /* always hide lightbox on print */
+    @media only print {
+        #lightbox_overlay {
+            display: none;
+        }
+    }
+
+    /* -------------------------------------------------- */
+    /* hypothesis (annotations) plugin */
+    /* -------------------------------------------------- */
+
+    /* side panel */
+    .annotator-frame {
+        width: 280px !important;
+        z-index: 0 !important;
+    }
+
+    /* match highlight color to rest of theme */
+    .annotator-highlights-always-on .annotator-hl {
+        background-color: #ffeb3b !important;
+    }
+
+    /* match focused color to rest of theme */
+    .annotator-hl.annotator-hl-focused {
+        background-color: #ff8a65 !important;
+    }
+
+    /* match bucket bar color to rest of theme */
+    .annotator-bucket-bar {
+        background: #f5f5f5 !important;
+    }
+
+    /* always hide toolbar and tooltip on print */
+    @media only print {
+        .annotator-frame {
+            display: none !important;
+        }
+
+        hypothesis-adder {
+            display: none !important;
+        }
+    }
+</style>
+<!-- table scroll plugin -->
+
+<script>
+    (function() {
+        // /////////////////////////
+        // DESCRIPTION
+        // /////////////////////////
+
+        // This Manubot plugin allows tables that are too wide to fit within
+        // the page to have a scrollbar instead of being squashed to fit.
+
+        // /////////////////////////
+        // OPTIONS
+        // /////////////////////////
+
+        // plugin name prefix for url parameters
+        const pluginName = 'tableScroll';
+
+        // default plugin options
+        const options = {
+            // whether plugin is on or not
+            enabled: 'true'
+        };
+
+        // change options above, or override with url parameter, eg:
+        // 'manuscript.html?pluginName-enabled=false'
+
+        // /////////////////////////
+        // SCRIPT
+        // /////////////////////////
+
+        // start script
+        function start() {
+            // wrap each table in a container
+            const tables = document.querySelectorAll('table');
+            for (const table of tables)
+                wrapElement(table).classList.add('table_wrapper');
+            // table_wrapper CSS class in theme file provides scroll
+            // functionality
+        }
+
+        // wrap element in div and return div
+        function wrapElement(element) {
+            const parent = element.parentNode;
+            const wrapper = document.createElement('div');
+            parent.replaceChild(wrapper, element);
+            wrapper.appendChild(element);
+            return wrapper;
+        }
+
+        // load options from url parameters
+        function loadOptions() {
+            const url = window.location.search;
+            const params = new URLSearchParams(url);
+            for (const optionName of Object.keys(options)) {
+                const paramName = pluginName + '-' + optionName;
+                const param = params.get(paramName);
+                if (param !== '' && param !== null)
+                    options[optionName] = param;
+            }
+        }
+        loadOptions();
+
+        // start script when document is finished loading
+        if (options.enabled === 'true')
+            window.addEventListener('load', start);
+    })();
+</script>
+<!-- anchors plugin -->
+
+<script>
+    (function() {
+        // /////////////////////////
+        // DESCRIPTION
+        // /////////////////////////
+
+        // This Manubot plugin adds an anchor next to each of a certain type
+        // of element that provides a human-readable url to that specific
+        // item/position in the document (eg "manuscript.html#abstract"). It
+        // also makes it such that scrolling out of view of a target removes
+        // its identifier from the url.
+
+        // /////////////////////////
+        // OPTIONS
+        // /////////////////////////
+
+        // plugin name prefix for url parameters
+        const pluginName = 'anchors';
+
+        // default plugin options
+        const options = {
+            // which types of elements to add anchors next to, in
+            // "document.querySelector" format
+            typesQuery: 'h1, h2, h3, figure, table',
+            // whether plugin is on or not
+            enabled: 'true'
+        };
+
+        // change options above, or override with url parameter, eg:
+        // 'manuscript.html?pluginName-enabled=false'
+
+        // /////////////////////////
+        // SCRIPT
+        // /////////////////////////
+
+        // start script
+        function start() {
+            // add anchor to each element of specified types
+            const elements = document.querySelectorAll(options.typesQuery);
+            for (const element of elements)
+                addAnchor(element);
+
+            // attach scroll listener to window
+            window.addEventListener('scroll', onScroll);
+        }
+
+        // when window is scrolled
+        function onScroll() {
+            // if url has hash and user has scrolled out of view of hash
+            // target, remove hash from url
+            const target = getHashTarget();
+            if (target) {
+                if (
+                    target.getBoundingClientRect().top > window.innerHeight ||
+                    target.getBoundingClientRect().bottom < 0
+                )
+                    history.pushState(null, null, ' ');
+            }
+        }
+
+        // add anchor to element
+        function addAnchor(element) {
+            let withId; // element with unique id
+            let addTo; // element to add anchor button to
+
+            // if figure or table, modify withId and addTo to get expected
+            // elements
+            if (element.tagName.toLowerCase() === 'figure') {
+                withId = element.querySelector('img');
+                addTo = element.querySelector('figcaption');
+            } else if (element.tagName.toLowerCase() === 'table') {
+                withId =
+                    element.previousElementSibling ||
+                    element.parentNode.previousElementSibling;
+                addTo = element.querySelector('caption');
+            }
+
+            withId = withId || element;
+            addTo = addTo || element;
+            const id = withId.id || withId.name || null;
+
+            // do not add anchor if element doesn't have assigned id.
+            // id is generated by pandoc and is assumed to be unique and
+            // human-readable
+            if (!id)
+                return;
+
+            // create anchor button
+            const anchor = document.createElement('a');
+            anchor.innerHTML = document.querySelector('.icon_link').innerHTML;
+            anchor.title = 'Link to this part of the document';
+            anchor.classList.add('icon_button', 'anchor');
+            anchor.dataset.ignore = 'true';
+            anchor.href = '#' + id;
+            addTo.appendChild(anchor);
+        }
+
+        // get element that is target of link or url hash
+        function getHashTarget() {
+            const hash = window.location.hash;
+            const id = hash.slice(1);
+            let target = document.querySelector(
+                '[id="' + id + '"], [name="' + id + '"]'
+            );
+            if (!target)
+                return;
+
+            // if figure or table, modify target to get expected element
+            if (hash.indexOf('#fig:') === 0)
+                target = target.parentNode;
+            if (hash.indexOf('#tbl:') === 0)
+                target = target.nextElementSibling;
+
+            return target;
+        }
+
+        // load options from url parameters
+        function loadOptions() {
+            const url = window.location.search;
+            const params = new URLSearchParams(url);
+            for (const optionName of Object.keys(options)) {
+                const paramName = pluginName + '-' + optionName;
+                const param = params.get(paramName);
+                if (param !== '' && param !== null)
+                    options[optionName] = param;
+            }
+        }
+        loadOptions();
+
+        // start script when document is finished loading
+        if (options.enabled === 'true')
+            window.addEventListener('load', start);
+    })();
+</script>
+
+<!-- link icon -->
+
+<template class="icon_link">
+    <!-- modified from: https://fontawesome.com/icons/link -->
+    <svg width="16" height="16" viewBox="0 0 512 512">
+        <path
+            fill="currentColor"
+            d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"
+        ></path>
+    </svg>
+</template>
+<!-- accordion plugin -->
+
+<script>
+    (function() {
+        // /////////////////////////
+        // DESCRIPTION
+        // /////////////////////////
+
+        // This Manubot plugin allows sections of content under <h2> headings
+        // to be collapsible.
+
+        // /////////////////////////
+        // OPTIONS
+        // /////////////////////////
+
+        // plugin name prefix for url parameters
+        const pluginName = 'accordion';
+
+        // default plugin options
+        const options = {
+            // whether to always start expanded ('false'), always start
+            // collapsed ('true'), or start collapsed when screen small ('auto')
+            startCollapsed: 'auto',
+            // whether plugin is on or not
+            enabled: 'true'
+        };
+
+        // change options above, or override with url parameter, eg:
+        // 'manuscript.html?pluginName-enabled=false'
+
+        // /////////////////////////
+        // SCRIPT
+        // /////////////////////////
+
+        // start script
+        function start() {
+            // run through each <h2> heading
+            const headings = document.querySelectorAll('h2');
+            for (const heading of headings) {
+                addArrow(heading);
+
+                // start expanded/collapsed based on option
+                if (
+                    options.startCollapsed === 'true' ||
+                    (options.startCollapsed === 'auto' && isSmallScreen())
+                )
+                    collapseHeading(heading);
+                else
+                    expandHeading(heading);
+            }
+
+            // attach hash change listener to window
+            window.addEventListener('hashchange', onHashChange);
+        }
+
+        // when hash (eg manuscript.html#introduction) changes
+        function onHashChange() {
+            const target = getHashTarget();
+            if (target)
+                goToElement(target);
+        }
+
+        // add arrow to heading
+        function addArrow(heading) {
+            // add arrow button
+            const arrow = document.createElement('button');
+            arrow.innerHTML = document.querySelector(
+                '.icon_angle_down'
+            ).innerHTML;
+            arrow.classList.add('icon_button', 'accordion_arrow');
+            heading.insertBefore(arrow, heading.firstChild);
+
+            // attach click listener to heading and button
+            heading.addEventListener('click', onHeadingClick);
+            arrow.addEventListener('click', onArrowClick);
+        }
+
+        // determine if on mobile-like device with small screen
+        function isSmallScreen() {
+            return Math.min(window.innerWidth, window.innerHeight) < 480;
+        }
+
+        // scroll to and focus element
+        function goToElement(element, offset) {
+            // expand accordion section if collapsed
+            expandElement(element);
+            const y =
+                getRectInView(element).top -
+                getRectInView(document.documentElement).top -
+                (offset || 0);
+            // trigger any function listening for "onscroll" event
+            window.dispatchEvent(new Event('scroll'));
+            window.scrollTo(0, y);
+            document.activeElement.blur();
+            element.focus();
+        }
+
+        // get element that is target of hash
+        function getHashTarget(link) {
+            const hash = link ? link.hash : window.location.hash;
+            const id = hash.slice(1);
+            let target = document.querySelector(
+                '[id="' + id + '"], [name="' + id + '"]'
+            );
+            if (!target)
+                return;
+
+            // if figure or table, modify target to get expected element
+            if (hash.indexOf('#fig:') === 0)
+                target = target.parentNode;
+            if (hash.indexOf('#tbl:') === 0)
+                target = target.nextElementSibling;
+
+            return target;
+        }
+
+        // when <h2> heading is clicked
+        function onHeadingClick(event) {
+            // only collapse if <h2> itself is target of click (eg, user did
+            // not click on anchor within <h2>)
+            if (event.target === this)
+                toggleCollapse(this);
+        }
+
+        // when arrow button is clicked
+        function onArrowClick() {
+            toggleCollapse(this.parentNode);
+        }
+
+        // collapse section if expanded, expand if collapsed
+        function toggleCollapse(heading) {
+            if (heading.dataset.collapsed === 'false')
+                collapseHeading(heading);
+            else
+                expandHeading(heading);
+        }
+
+        // elements to exclude from collapse, such as table of contents panel,
+        // hypothesis panel, etc
+        const exclude = '#toc_panel, div.annotator-frame, #lightbox_overlay';
+
+        // collapse section
+        function collapseHeading(heading) {
+            heading.setAttribute('data-collapsed', 'true');
+            const children = getChildren(heading);
+            for (const child of children)
+                child.setAttribute('data-collapsed', 'true');
+        }
+
+        // expand section
+        function expandHeading(heading) {
+            heading.setAttribute('data-collapsed', 'false');
+            const children = getChildren(heading);
+            for (const child of children)
+                child.setAttribute('data-collapsed', 'false');
+        }
+
+        // get list of elements between this <h2> and next <h2> or <h1>
+        // ("children" of the <h2> section)
+        function getChildren(heading) {
+            return nextUntil(heading, 'h2, h1', exclude);
+        }
+
+        // get position/dimensions of element or viewport
+        function getRectInView(element) {
+            let rect = {};
+            rect.left = 0;
+            rect.top = 0;
+            rect.right = document.documentElement.clientWidth;
+            rect.bottom = document.documentElement.clientHeight;
+            let style = {};
+
+            if (element instanceof HTMLElement) {
+                rect = element.getBoundingClientRect();
+                style = window.getComputedStyle(element);
+            }
+
+            const margin = {};
+            margin.left = parseFloat(style.marginLeftWidth) || 0;
+            margin.top = parseFloat(style.marginTopWidth) || 0;
+            margin.right = parseFloat(style.marginRightWidth) || 0;
+            margin.bottom = parseFloat(style.marginBottomWidth) || 0;
+
+            const border = {};
+            border.left = parseFloat(style.borderLeftWidth) || 0;
+            border.top = parseFloat(style.borderTopWidth) || 0;
+            border.right = parseFloat(style.borderRightWidth) || 0;
+            border.bottom = parseFloat(style.borderBottomWidth) || 0;
+
+            const newRect = {};
+            newRect.left = rect.left + margin.left + border.left;
+            newRect.top = rect.top + margin.top + border.top;
+            newRect.right = rect.right + margin.right + border.right;
+            newRect.bottom = rect.bottom + margin.bottom + border.bottom;
+            newRect.width = newRect.right - newRect.left;
+            newRect.height = newRect.bottom - newRect.top;
+
+            return newRect;
+        }
+
+        // get list of elements after a start element up to element matching
+        // query
+        function nextUntil(element, query, exclude) {
+            const elements = [];
+            while (element = element.nextElementSibling, element) {
+                if (element.matches(query))
+                    break;
+                if (!element.matches(exclude))
+                    elements.push(element);
+            }
+            return elements;
+        }
+
+        // get closest element before specified element that matches query
+        function firstBefore(element, query) {
+            while (
+                element &&
+                element !== document.body &&
+                !element.matches(query)
+            )
+                element = element.previousElementSibling || element.parentNode;
+
+            return element;
+        }
+
+        // check if element is part of collapsed heading
+        function isCollapsed(element) {
+            while (element && element !== document.body) {
+                if (element.dataset.collapsed === 'true')
+                    return true;
+                element = element.parentNode;
+            }
+            return false;
+        }
+
+        // expand heading containing element if necesary
+        function expandElement(element) {
+            if (isCollapsed(element)) {
+                const heading = firstBefore(element, 'h2');
+                if (heading)
+                    heading.click();
+            }
+        }
+
+        // load options from url parameters
+        function loadOptions() {
+            const url = window.location.search;
+            const params = new URLSearchParams(url);
+            for (const optionName of Object.keys(options)) {
+                const paramName = pluginName + '-' + optionName;
+                const param = params.get(paramName);
+                if (param !== '' && param !== null)
+                    options[optionName] = param;
+            }
+        }
+        loadOptions();
+
+        // start script when document is finished loading
+        if (options.enabled === 'true')
+            window.addEventListener('load', start);
+    })();
+</script>
+
+<!-- angle down icon -->
+
+<template class="icon_angle_down">
+    <!-- modified from: https://fontawesome.com/icons/angle-down -->
+    <svg width="16" height="16" viewBox="0 0 448 512">
+        <path
+            fill="currentColor"
+            d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"
+        ></path>
+    </svg>
+</template>
+<!-- tooltips plugin -->
+
+<script>
+    (function() {
+        // /////////////////////////
+        // DESCRIPTION
+        // /////////////////////////
+
+        // This Manubot plugin makes it such that when the user hovers or
+        // focuses a link to a citation or figure, a tooltip appears with a
+        // preview of the reference content, along with arrows to navigate
+        // between instances of the same reference in the document.
+
+        // /////////////////////////
+        // OPTIONS
+        // /////////////////////////
+
+        // plugin name prefix for url parameters
+        const pluginName = 'tooltips';
+
+        // default plugin options
+        const options = {
+            // whether user must click off to close tooltip instead of just
+            // un-hovering
+            clickClose: 'false',
+            // delay (in ms) between opening and closing tooltip
+            delay: '100',
+            // whether plugin is on or not
+            enabled: 'true'
+        };
+
+        // change options above, or override with url parameter, eg:
+        // 'manuscript.html?pluginName-enabled=false'
+
+        // /////////////////////////
+        // SCRIPT
+        // /////////////////////////
+
+        // start script
+        function start() {
+            const links = getLinks();
+            for (const link of links) {
+                // attach hover and focus listeners to link
+                link.addEventListener('mouseover', onLinkHover);
+                link.addEventListener('mouseleave', onLinkUnhover);
+                link.addEventListener('focus', onLinkFocus);
+                link.addEventListener('touchend', onLinkTouch);
+            }
+
+            // attach mouse, key, and resize listeners to window
+            window.addEventListener('mousedown', onClick);
+            window.addEventListener('touchstart', onClick);
+            window.addEventListener('keyup', onKeyUp);
+            window.addEventListener('resize', onResize);
+        }
+
+        // when link is hovered
+        function onLinkHover() {
+            // function to open tooltip
+            const delayOpenTooltip = function() {
+                openTooltip(this);
+            }.bind(this);
+
+            // run open function after delay
+            this.openTooltipTimer = window.setTimeout(
+                delayOpenTooltip,
+                options.delay
+            );
+        }
+
+        // when mouse leaves link
+        function onLinkUnhover() {
+            // cancel opening tooltip
+            window.clearTimeout(this.openTooltipTimer);
+
+            // don't close on unhover if option specifies
+            if (options.clickClose === 'true')
+                return;
+
+            // function to close tooltip
+            const delayCloseTooltip = function() {
+                // if tooltip open and if mouse isn't over tooltip, close
+                const tooltip = document.getElementById('tooltip');
+                if (tooltip && !tooltip.matches(':hover'))
+                    closeTooltip();
+            };
+
+            // run close function after delay
+            this.closeTooltipTimer = window.setTimeout(
+                delayCloseTooltip,
+                options.delay
+            );
+        }
+
+        // when link is focused (tabbed to)
+        function onLinkFocus(event) {
+            openTooltip(this);
+        }
+
+        // when link is touched on touch screen
+        function onLinkTouch(event) {
+            // attempt to force hover state on first tap always, and trigger
+            // regular link click (and navigation) on second tap
+            if (event.target === document.activeElement)
+                event.target.click();
+            else {
+                document.activeElement.blur();
+                event.target.focus();
+            }
+            if (event.cancelable)
+                event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+
+        // when mouse is clicked anywhere in window
+        function onClick(event) {
+            closeTooltip();
+        }
+
+        // when key pressed
+        function onKeyUp(event) {
+            if (!event || !event.key)
+                return;
+
+            switch (event.key) {
+                // trigger click of prev button
+                case 'ArrowLeft':
+                    const prevButton = document.getElementById(
+                        'tooltip_prev_button'
+                    );
+                    if (prevButton)
+                        prevButton.click();
+                    break;
+                // trigger click of next button
+                case 'ArrowRight':
+                    const nextButton = document.getElementById(
+                        'tooltip_next_button'
+                    );
+                    if (nextButton)
+                        nextButton.click();
+                    break;
+                // close on esc
+                case 'Escape':
+                    closeTooltip();
+                    break;
+            }
+        }
+
+        // when window is resized or zoomed
+        function onResize() {
+            closeTooltip();
+        }
+
+        // get all links of types we wish to handle
+        function getLinks() {
+            const queries = [];
+            // exclude buttons, anchor links, toc links, etc
+            const exclude =
+                ':not(.button):not(.icon_button):not(.anchor):not(.toc_link)';
+            queries.push('a[href^="#ref-"]' + exclude); // citation links
+            queries.push('a[href^="#fig:"]' + exclude); // figure links
+            const query = queries.join(', ');
+            return document.querySelectorAll(query);
+        }
+
+        // get links with same target, get index of link in set, get total
+        // same links
+        function getSameLinks(link) {
+            const sameLinks = [];
+            const links = getLinks();
+            for (const otherLink of links) {
+                if (
+                    otherLink.getAttribute('href') === link.getAttribute('href')
+                )
+                    sameLinks.push(otherLink);
+            }
+
+            return {
+                elements: sameLinks,
+                index: sameLinks.indexOf(link),
+                total: sameLinks.length
+            };
+        }
+
+        // open tooltip
+        function openTooltip(link) {
+            // delete tooltip if it exists, start fresh
+            closeTooltip();
+
+            // make tooltip element
+            const tooltip = makeTooltip(link);
+
+            // if source couldn't be found and tooltip not made, exit
+            if (!tooltip)
+                return;
+
+            // make navbar elements
+            const navBar = makeNavBar(link);
+            if (navBar)
+                tooltip.firstElementChild.appendChild(navBar);
+
+            // attach tooltip to page
+            document.body.appendChild(tooltip);
+
+            // position tooltip
+            const position = function() {
+                positionTooltip(link);
+            };
+            position();
+
+            // if tooltip contains images, position again after they've loaded
+            const imgs = tooltip.querySelectorAll('img');
+            for (const img of imgs)
+                img.addEventListener('load', position);
+        }
+
+        // close (delete) tooltip
+        function closeTooltip() {
+            const tooltip = document.getElementById('tooltip');
+            if (tooltip)
+                tooltip.remove();
+        }
+
+        // make tooltip
+        function makeTooltip(link) {
+            // get target element that link points to
+            const source = getSource(link);
+
+            // if source can't be found, exit
+            if (!source)
+                return;
+
+            // create new tooltip
+            const tooltip = document.createElement('div');
+            tooltip.id = 'tooltip';
+            const tooltipContent = document.createElement('div');
+            tooltipContent.id = 'tooltip_content';
+            tooltip.appendChild(tooltipContent);
+
+            // make copy of source node and put in tooltip
+            const sourceCopy = makeCopy(source);
+            tooltipContent.appendChild(sourceCopy);
+
+            // attach mouse event listeners
+            tooltip.addEventListener('click', onTooltipClick);
+            tooltip.addEventListener('mousedown', onTooltipClick);
+            tooltip.addEventListener('touchstart', onTooltipClick);
+            tooltip.addEventListener('mouseleave', onTooltipUnhover);
+
+            // (for interaction with lightbox plugin)
+            // transfer click on tooltip copied img to original img
+            const sourceImg = source.querySelector('img');
+            const sourceCopyImg = sourceCopy.querySelector('img');
+            if (sourceImg && sourceCopyImg) {
+                const clickImg = function() {
+                    sourceImg.click();
+                    closeTooltip();
+                };
+                sourceCopyImg.addEventListener('click', clickImg);
+            }
+
+            return tooltip;
+        }
+
+        // make carbon copy of html dom element
+        function makeCopy(source) {
+            const sourceCopy = source.cloneNode(true);
+
+            // delete elements marked with ignore (eg anchor and jump buttons)
+            const deleteFromCopy = sourceCopy.querySelectorAll(
+                '[data-ignore="true"]'
+            );
+            for (const element of deleteFromCopy)
+                element.remove();
+
+            // delete certain element attributes
+            const attributes = [
+                'id',
+                'data-collapsed',
+                'data-selected',
+                'data-highlighted',
+                'data-glow'
+            ];
+            for (const attribute of attributes) {
+                sourceCopy.removeAttribute(attribute);
+                const elements = sourceCopy.querySelectorAll(
+                    '[' + attribute + ']'
+                );
+                for (const element of elements)
+                    element.removeAttribute(attribute);
+            }
+
+            return sourceCopy;
+        }
+
+        // when tooltip is clicked
+        function onTooltipClick(event) {
+            // when user clicks on tooltip, stop click from transferring
+            // outside of tooltip (eg, click off to close tooltip, or eg click
+            // off to unhighlight same refs)
+            event.stopPropagation();
+        }
+
+        // when tooltip is unhovered
+        function onTooltipUnhover(event) {
+            if (options.clickClose === 'true')
+                return;
+
+            // make sure new mouse/touch/focus no longer over tooltip or any
+            // element within it
+            const tooltip = document.getElementById('tooltip');
+            if (!tooltip)
+                return;
+            if (this.contains(event.relatedTarget))
+                return;
+
+            closeTooltip();
+        }
+
+        // make nav bar to go betwen prev/next instances of same reference
+        function makeNavBar(link) {
+            // find other links to the same source
+            const sameLinks = getSameLinks(link);
+
+            // don't show nav bar when singular reference
+            if (sameLinks.total <= 1)
+                return;
+
+            // find prev/next links with same target
+            const prevLink = getPrevLink(link, sameLinks);
+            const nextLink = getNextLink(link, sameLinks);
+
+            // create nav bar
+            const navBar = document.createElement('div');
+            navBar.id = 'tooltip_nav_bar';
+            const text = sameLinks.index + 1 + ' of ' + sameLinks.total;
+
+            // create nav bar prev/next buttons
+            const prevButton = document.createElement('button');
+            const nextButton = document.createElement('button');
+            prevButton.id = 'tooltip_prev_button';
+            nextButton.id = 'tooltip_next_button';
+            prevButton.title =
+                'Jump to the previous occurence of this item in the document [←]';
+            nextButton.title =
+                'Jump to the next occurence of this item in the document [→]';
+            prevButton.classList.add('icon_button');
+            nextButton.classList.add('icon_button');
+            prevButton.innerHTML = document.querySelector(
+                '.icon_caret_left'
+            ).innerHTML;
+            nextButton.innerHTML = document.querySelector(
+                '.icon_caret_right'
+            ).innerHTML;
+            navBar.appendChild(prevButton);
+            navBar.appendChild(document.createTextNode(text));
+            navBar.appendChild(nextButton);
+
+            // attach click listeners to buttons
+            prevButton.addEventListener('click', function() {
+                onPrevNextClick(link, prevLink);
+            });
+            nextButton.addEventListener('click', function() {
+                onPrevNextClick(link, nextLink);
+            });
+
+            return navBar;
+        }
+
+        // get previous link with same target
+        function getPrevLink(link, sameLinks) {
+            if (!sameLinks)
+                sameLinks = getSameLinks(link);
+            // wrap index to other side if < 1
+            let index;
+            if (sameLinks.index - 1 >= 0)
+                index = sameLinks.index - 1;
+            else
+                index = sameLinks.total - 1;
+            return sameLinks.elements[index];
+        }
+
+        // get next link with same target
+        function getNextLink(link, sameLinks) {
+            if (!sameLinks)
+                sameLinks = getSameLinks(link);
+            // wrap index to other side if > total
+            let index;
+            if (sameLinks.index + 1 <= sameLinks.total - 1)
+                index = sameLinks.index + 1;
+            else
+                index = 0;
+            return sameLinks.elements[index];
+        }
+
+        // get element that is target of link or url hash
+        function getSource(link) {
+            const hash = link ? link.hash : window.location.hash;
+            const id = hash.slice(1);
+            let target = document.querySelector(
+                '[id="' + id + '"], [name="' + id + '"]'
+            );
+            if (!target)
+                return;
+
+            // if figure or table, modify target to get expected element
+            if (hash.indexOf('#ref-') === 0)
+                target = target.querySelector('p');
+            else if (hash.indexOf('#fig:') === 0)
+                target = target.parentNode;
+            else if (hash.indexOf('#tbl:') === 0)
+                return;
+
+            return target;
+        }
+
+        // when prev/next arrow button is clicked
+        function onPrevNextClick(link, prevNextLink) {
+            if (link && prevNextLink)
+                goToElement(prevNextLink, window.innerHeight * 0.5);
+        }
+
+        // scroll to and focus element
+        function goToElement(element, offset) {
+            // expand accordion section if collapsed
+            expandElement(element);
+            const y =
+                getRectInView(element).top -
+                getRectInView(document.documentElement).top -
+                (offset || 0);
+            // trigger any function listening for "onscroll" event
+            window.dispatchEvent(new Event('scroll'));
+            window.scrollTo(0, y);
+            document.activeElement.blur();
+            element.focus();
+        }
+
+        // determine position to place tooltip based on link position in
+        // viewport and tooltip size
+        function positionTooltip(link, left, top) {
+            const tooltipElement = document.getElementById('tooltip');
+            if (!tooltipElement)
+                return;
+
+            // get convenient vars for position/dimensions of
+            // link/tooltip/page/view
+            link = getRectInPage(link);
+            const tooltip = getRectInPage(tooltipElement);
+            const view = getRectInPage();
+
+            // horizontal positioning
+            if (left)
+                // use explicit value
+                left = left;
+            else if (link.left + tooltip.width < view.right)
+                // fit tooltip to right of link
+                left = link.left;
+            else if (link.right - tooltip.width > view.left)
+                // fit tooltip to left of link
+                left = link.right - tooltip.width;
+            // center tooltip in view
+            else
+                left = (view.right - view.left) / 2 - tooltip.width / 2;
+
+            // vertical positioning
+            if (top)
+                // use explicit value
+                top = top;
+            else if (link.top - tooltip.height > view.top)
+                // fit tooltip above link
+                top = link.top - tooltip.height;
+            else if (link.bottom + tooltip.height < view.bottom)
+                // fit tooltip below link
+                top = link.bottom;
+            else {
+                // center tooltip in view
+                top = view.top + view.height / 2 - tooltip.height / 2;
+                // nudge off of link to left/right if possible
+                if (link.right + tooltip.width < view.right)
+                    left = link.right;
+                else if (link.left - tooltip.width > view.left)
+                    left = link.left - tooltip.width;
+            }
+
+            tooltipElement.style.left = left + 'px';
+            tooltipElement.style.top = top + 'px';
+        }
+
+        // get position/dimensions of element or viewport
+        function getRectInView(element) {
+            let rect = {};
+            rect.left = 0;
+            rect.top = 0;
+            rect.right = document.documentElement.clientWidth;
+            rect.bottom = document.documentElement.clientHeight;
+            let style = {};
+
+            if (element instanceof HTMLElement) {
+                rect = element.getBoundingClientRect();
+                style = window.getComputedStyle(element);
+            }
+
+            const margin = {};
+            margin.left = parseFloat(style.marginLeftWidth) || 0;
+            margin.top = parseFloat(style.marginTopWidth) || 0;
+            margin.right = parseFloat(style.marginRightWidth) || 0;
+            margin.bottom = parseFloat(style.marginBottomWidth) || 0;
+
+            const border = {};
+            border.left = parseFloat(style.borderLeftWidth) || 0;
+            border.top = parseFloat(style.borderTopWidth) || 0;
+            border.right = parseFloat(style.borderRightWidth) || 0;
+            border.bottom = parseFloat(style.borderBottomWidth) || 0;
+
+            const newRect = {};
+            newRect.left = rect.left + margin.left + border.left;
+            newRect.top = rect.top + margin.top + border.top;
+            newRect.right = rect.right + margin.right + border.right;
+            newRect.bottom = rect.bottom + margin.bottom + border.bottom;
+            newRect.width = newRect.right - newRect.left;
+            newRect.height = newRect.bottom - newRect.top;
+
+            return newRect;
+        }
+
+        // get position of element relative to page
+        function getRectInPage(element) {
+            const rect = getRectInView(element);
+            const body = getRectInView(document.body);
+
+            const newRect = {};
+            newRect.left = rect.left - body.left;
+            newRect.top = rect.top - body.top;
+            newRect.right = rect.right - body.left;
+            newRect.bottom = rect.bottom - body.top;
+            newRect.width = rect.width;
+            newRect.height = rect.height;
+
+            return newRect;
+        }
+
+        // (for interaction with accordion plugin)
+        // get closest element before specified element that matches query
+        function firstBefore(element, query) {
+            while (
+                element &&
+                element !== document.body &&
+                !element.matches(query)
+            )
+                element = element.previousElementSibling || element.parentNode;
+
+            return element;
+        }
+
+        // (for interaction with accordion plugin)
+        // check if element is part of collapsed heading
+        function isCollapsed(element) {
+            while (element && element !== document.body) {
+                if (element.dataset.collapsed === 'true')
+                    return true;
+                element = element.parentNode;
+            }
+            return false;
+        }
+
+        // (for interaction with accordion plugin)
+        // expand heading containing element if necesary
+        function expandElement(element) {
+            if (isCollapsed(element)) {
+                const heading = firstBefore(element, 'h2');
+                if (heading)
+                    heading.click();
+            }
+        }
+
+        // load options from url parameters
+        function loadOptions() {
+            const url = window.location.search;
+            const params = new URLSearchParams(url);
+            for (const optionName of Object.keys(options)) {
+                const paramName = pluginName + '-' + optionName;
+                const param = params.get(paramName);
+                if (param !== '' && param !== null)
+                    options[optionName] = param;
+            }
+        }
+        loadOptions();
+
+        // start script when document is finished loading
+        if (options.enabled === 'true')
+            window.addEventListener('load', start);
+    })();
+</script>
+
+<!-- caret left icon -->
+
+<template class="icon_caret_left">
+    <!-- modified from: https://fontawesome.com/icons/caret-left -->
+    <svg width="16" height="16" viewBox="0 0 192 512">
+        <path
+            fill="currentColor"
+            d="M192 127.338v257.324c0 17.818-21.543 26.741-34.142 14.142L29.196 270.142c-7.81-7.81-7.81-20.474 0-28.284l128.662-128.662c12.599-12.6 34.142-3.676 34.142 14.142z"
+        ></path>
+    </svg>
+</template>
+
+<!-- caret right icon -->
+
+<template class="icon_caret_right">
+    <!-- modified from: https://fontawesome.com/icons/caret-right -->
+    <svg width="16" height="16" viewBox="0 0 192 512">
+        <path
+            fill="currentColor"
+            d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"
+        ></path>
+    </svg>
+</template>
+<!-- jump to first plugin -->
+
+<script>
+    (function() {
+        // /////////////////////////
+        // DESCRIPTION
+        // /////////////////////////
+
+        // This Manubot plugin adds a button next to each reference entry,
+        // figure, and table that jumps the page to the first occurrence of a
+        // link to that item in the manuscript.
+
+        // /////////////////////////
+        // OPTIONS
+        // /////////////////////////
+
+        // plugin name prefix for url parameters
+        const pluginName = 'jumpToFirst';
+
+        // default plugin options
+        const options = {
+            // whether to add buttons next to reference entries
+            references: 'true',
+            // whether to add buttons next to figures
+            figures: 'true',
+            // whether to add buttons next to tables
+            tables: 'true',
+            // whether plugin is on or not
+            enabled: 'true'
+        };
+
+        // change options above, or override with url parameter, eg:
+        // 'manuscript.html?pluginName-enabled=false'
+
+        // /////////////////////////
+        // SCRIPT
+        // /////////////////////////
+
+        // start script
+        function start() {
+            if (options.references !== 'false')
+                makeReferenceButtons();
+            if (options.figures !== 'false')
+                makeFigureButtons();
+            if (options.tables !== 'false')
+                makeTableButtons();
+        }
+
+        // when jump button clicked
+        function onButtonClick() {
+            const first = getFirstOccurrence(this.dataset.id);
+            if (!first)
+                return;
+
+            // update url hash so navigating "back" in history will return
+            // user to jump button
+            window.location.hash = this.dataset.id;
+            // scroll to link
+            window.setTimeout(function() {
+                goToElement(first, window.innerHeight * 0.5);
+            }, 0);
+        }
+
+        // get first occurence of link to item in document
+        function getFirstOccurrence(id) {
+            let query = 'a';
+            query += '[href="#' + id + '"]';
+            // exclude buttons, anchor links, toc links, etc
+            query +=
+                ':not(.button):not(.icon_button):not(.anchor):not(.toc_link)';
+            return document.querySelector(query);
+        }
+
+        // add button next to each reference entry
+        function makeReferenceButtons() {
+            const references = document.querySelectorAll('div[id^="ref-"]');
+            for (const reference of references) {
+                // get reference id and element to add button to
+                const id = reference.id;
+                const container = reference.firstElementChild;
+                const first = getFirstOccurrence(id);
+
+                // if can't find link to reference, ignore
+                if (!first)
+                    continue;
+
+                // make jump button
+                let button = document.createElement('button');
+                button.classList.add('icon_button', 'jump_arrow');
+                button.title =
+                    'Jump to the first occurence of this reference in the document';
+                button.innerHTML = document.querySelector(
+                    '.icon_angle_double_up'
+                ).innerHTML;
+                button.dataset.id = id;
+                button.dataset.ignore = 'true';
+                container.innerHTML = button.outerHTML + container.innerHTML;
+                button = container.firstElementChild;
+                button.addEventListener('click', onButtonClick);
+            }
+        }
+
+        // add button next to each figure
+        function makeFigureButtons() {
+            const figures = document.querySelectorAll('img[id^="fig:"]');
+            for (const figure of figures) {
+                // get figure id and element to add button to
+                const id = figure.id;
+                const container = figure.nextElementSibling;
+                const first = getFirstOccurrence(id);
+
+                // if can't find link to figure, ignore
+                if (!first)
+                    continue;
+
+                // make jump button
+                const button = document.createElement('button');
+                button.classList.add('icon_button', 'jump_arrow');
+                button.title =
+                    'Jump to the first occurence of this figure in the document';
+                button.innerHTML = document.querySelector(
+                    '.icon_angle_double_up'
+                ).innerHTML;
+                button.dataset.id = id;
+                button.dataset.ignore = 'true';
+                container.insertBefore(button, container.firstElementChild);
+                button.addEventListener('click', onButtonClick);
+            }
+        }
+
+        // add button next to each figure
+        function makeTableButtons() {
+            const tables = document.querySelectorAll('a[name^="tbl:"]');
+            for (const table of tables) {
+                // get ref id and element to add button to
+                const id = table.name;
+                const container = table.nextElementSibling.querySelector(
+                    'caption'
+                );
+                const first = getFirstOccurrence(id);
+
+                // if can't find link to table, ignore
+                if (!first)
+                    continue;
+
+                // make jump button
+                const button = document.createElement('button');
+                button.classList.add('icon_button', 'jump_arrow');
+                button.title =
+                    'Jump to the first occurence of this table in the document';
+                button.innerHTML = document.querySelector(
+                    '.icon_angle_double_up'
+                ).innerHTML;
+                button.dataset.id = id;
+                button.dataset.ignore = 'true';
+                container.insertBefore(button, container.firstElementChild);
+                button.addEventListener('click', onButtonClick);
+            }
+        }
+
+        // scroll to and focus element
+        function goToElement(element, offset) {
+            // expand accordion section if collapsed
+            expandElement(element);
+            const y =
+                getRectInView(element).top -
+                getRectInView(document.documentElement).top -
+                (offset || 0);
+            // trigger any function listening for "onscroll" event
+            window.dispatchEvent(new Event('scroll'));
+            window.scrollTo(0, y);
+            document.activeElement.blur();
+            element.focus();
+        }
+
+        // get position/dimensions of element or viewport
+        function getRectInView(element) {
+            let rect = {};
+            rect.left = 0;
+            rect.top = 0;
+            rect.right = document.documentElement.clientWidth;
+            rect.bottom = document.documentElement.clientHeight;
+            let style = {};
+
+            if (element instanceof HTMLElement) {
+                rect = element.getBoundingClientRect();
+                style = window.getComputedStyle(element);
+            }
+
+            const margin = {};
+            margin.left = parseFloat(style.marginLeftWidth) || 0;
+            margin.top = parseFloat(style.marginTopWidth) || 0;
+            margin.right = parseFloat(style.marginRightWidth) || 0;
+            margin.bottom = parseFloat(style.marginBottomWidth) || 0;
+
+            const border = {};
+            border.left = parseFloat(style.borderLeftWidth) || 0;
+            border.top = parseFloat(style.borderTopWidth) || 0;
+            border.right = parseFloat(style.borderRightWidth) || 0;
+            border.bottom = parseFloat(style.borderBottomWidth) || 0;
+
+            const newRect = {};
+            newRect.left = rect.left + margin.left + border.left;
+            newRect.top = rect.top + margin.top + border.top;
+            newRect.right = rect.right + margin.right + border.right;
+            newRect.bottom = rect.bottom + margin.bottom + border.bottom;
+            newRect.width = newRect.right - newRect.left;
+            newRect.height = newRect.bottom - newRect.top;
+
+            return newRect;
+        }
+
+        // get closest element before specified element that matches query
+        function firstBefore(element, query) {
+            while (
+                element &&
+                element !== document.body &&
+                !element.matches(query)
+            )
+                element = element.previousElementSibling || element.parentNode;
+
+            return element;
+        }
+
+        // check if element is part of collapsed heading
+        function isCollapsed(element) {
+            while (element && element !== document.body) {
+                if (element.dataset.collapsed === 'true')
+                    return true;
+                element = element.parentNode;
+            }
+            return false;
+        }
+
+        // (for interaction with accordion plugin)
+        // expand heading containing element if necesary
+        function expandElement(element) {
+            if (isCollapsed(element)) {
+                const heading = firstBefore(element, 'h2');
+                if (heading)
+                    heading.click();
+            }
+        }
+
+        // load options from url parameters
+        function loadOptions() {
+            const url = window.location.search;
+            const params = new URLSearchParams(url);
+            for (const optionName of Object.keys(options)) {
+                const paramName = pluginName + '-' + optionName;
+                const param = params.get(paramName);
+                if (param !== '' && param !== null)
+                    options[optionName] = param;
+            }
+        }
+        loadOptions();
+
+        // start script when document is finished loading
+        if (options.enabled === 'true')
+            window.addEventListener('load', start);
+    })();
+</script>
+
+<!-- angle double up icon -->
+
+<template class="icon_angle_double_up">
+    <!-- modified from: https://fontawesome.com/icons/angle-double-up -->
+    <svg width="16" height="16" viewBox="0 0 320 512">
+        <path
+            fill="currentColor"
+            d="M177 255.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 351.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 425.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1zm-34-192L7 199.7c-9.4 9.4-9.4 24.6 0 33.9l22.6 22.6c9.4 9.4 24.6 9.4 33.9 0l96.4-96.4 96.4 96.4c9.4 9.4 24.6 9.4 33.9 0l22.6-22.6c9.4-9.4 9.4-24.6 0-33.9l-136-136c-9.2-9.4-24.4-9.4-33.8 0z"
+        ></path>
+    </svg>
+</template>
+<!-- link highlight plugin -->
+
+<script>
+    (function() {
+        // /////////////////////////
+        // DESCRIPTION
+        // /////////////////////////
+
+        // This Manubot plugin makes it such that when a user hovers or
+        // focuses a link, other links that have the same target will be
+        // highlighted. It also makes it such that when clicking a link, the
+        // target of the link (eg reference, figure, table) is briefly
+        // highlighted.
+
+        // /////////////////////////
+        // OPTIONS
+        // /////////////////////////
+
+        // plugin name prefix for url parameters
+        const pluginName = 'linkHighlight';
+
+        // default plugin options
+        const options = {
+            // whether to also highlight links that go to external urls
+            externalLinks: 'false',
+            // whether user must click off to unhighlight instead of just
+            // un-hovering
+            clickUnhighlight: 'false',
+            // whether to also highlight links that are unique
+            highlightUnique: 'true',
+            // whether plugin is on or not
+            enabled: 'true'
+        };
+
+        // change options above, or override with url parameter, eg:
+        // 'manuscript.html?pluginName-enabled=false'
+
+        // /////////////////////////
+        // SCRIPT
+        // /////////////////////////
+
+        // start script
+        function start() {
+            const links = getLinks();
+            for (const link of links) {
+                // attach mouse and focus listeners to link
+                link.addEventListener('mouseenter', onLinkFocus);
+                link.addEventListener('focus', onLinkFocus);
+                link.addEventListener('mouseleave', onLinkUnhover);
+            }
+
+            // attach click and hash change listeners to window
+            window.addEventListener('click', onClick);
+            window.addEventListener('touchstart', onClick);
+            window.addEventListener('hashchange', onHashChange);
+
+            // run hash change on window load in case user has navigated
+            // directly to hash
+            onHashChange();
+        }
+
+        // when link is focused (tabbed to) or hovered
+        function onLinkFocus() {
+            highlight(this);
+        }
+
+        // when link is unhovered
+        function onLinkUnhover() {
+            if (options.clickUnhighlight !== 'true')
+                unhighlightAll();
+        }
+
+        // when the mouse is clicked anywhere in window
+        function onClick(event) {
+            unhighlightAll();
+        }
+
+        // when hash (eg manuscript.html#introduction) changes
+        function onHashChange() {
+            const target = getHashTarget();
+            if (target)
+                glowElement(target);
+        }
+
+        // get element that is target of link or url hash
+        function getHashTarget(link) {
+            const hash = link ? link.hash : window.location.hash;
+            const id = hash.slice(1);
+            let target = document.querySelector(
+                '[id="' + id + '"], [name="' + id + '"]'
+            );
+            if (!target)
+                return;
+
+            // if figure or table, modify target to get expected element
+            if (hash.indexOf('#fig:') === 0)
+                target = target.parentNode;
+            else if (hash.indexOf('#tbl:') === 0)
+                target = target.nextElementSibling.querySelector('caption');
+
+            return target;
+        }
+
+        // start glow sequence on an element
+        function glowElement(element) {
+            const startGlow = function() {
+                onGlowEnd();
+                element.dataset.glow = 'true';
+                element.addEventListener('animationend', onGlowEnd);
+            };
+            const onGlowEnd = function() {
+                element.removeAttribute('data-glow');
+                element.removeEventListener('animationend', onGlowEnd);
+            };
+            startGlow();
+        }
+
+        // highlight link and all others with same target
+        function highlight(link) {
+            // force unhighlight all to start fresh
+            unhighlightAll();
+
+            // get links with same target
+            if (!link)
+                return;
+            const sameLinks = getSameLinks(link);
+
+            // if link unique and option is off, exit and don't highlight
+            if (sameLinks.length <= 1 && options.highlightUnique !== 'true')
+                return;
+
+            // highlight all same links, and "select" (special highlight) this
+            // one
+            for (const sameLink of sameLinks) {
+                if (sameLink === link)
+                    sameLink.setAttribute('data-selected', 'true');
+                else
+                    sameLink.setAttribute('data-highlighted', 'true');
+            }
+        }
+
+        // unhighlight all links
+        function unhighlightAll() {
+            const links = getLinks();
+            for (const link of links) {
+                link.setAttribute('data-selected', 'false');
+                link.setAttribute('data-highlighted', 'false');
+            }
+        }
+
+        // get links with same target
+        function getSameLinks(link) {
+            const results = [];
+            const links = getLinks();
+            for (const otherLink of links) {
+                if (
+                    otherLink.getAttribute('href') === link.getAttribute('href')
+                )
+                    results.push(otherLink);
+            }
+            return results;
+        }
+
+        // get all links of types we wish to handle
+        function getLinks() {
+            let query = 'a';
+            if (options.externalLinks !== 'true')
+                query += '[href^="#"]';
+            // exclude buttons, anchor links, toc links, etc
+            query +=
+                ':not(.button):not(.icon_button):not(.anchor):not(.toc_link)';
+            return document.querySelectorAll(query);
+        }
+
+        // load options from url parameters
+        function loadOptions() {
+            const url = window.location.search;
+            const params = new URLSearchParams(url);
+            for (const optionName of Object.keys(options)) {
+                const paramName = pluginName + '-' + optionName;
+                const param = params.get(paramName);
+                if (param !== '' && param !== null)
+                    options[optionName] = param;
+            }
+        }
+        loadOptions();
+
+        // start script when document is finished loading
+        if (options.enabled === 'true')
+            window.addEventListener('load', start);
+    })();
+</script>
+<!-- table of contents plugin -->
+
+<script>
+    (function() {
+        // /////////////////////////
+        // DESCRIPTION
+        // /////////////////////////
+
+        // This Manubot plugin provides a "table of contents" (toc) panel on
+        // the side of the document that allows the user to conveniently
+        // navigate between sections of the document.
+
+        // /////////////////////////
+        // OPTIONS
+        // /////////////////////////
+
+        // plugin name prefix for url parameters
+        const pluginName = 'tableOfContents';
+
+        // default plugin options
+        const options = {
+            // which types of elements to add links for, in
+            // "document.querySelector" format
+            typesQuery: 'h1, h2, h3',
+            // whether default behavior is to be closed ('false'), open
+            // ('true'), or only open when screen wide enough to fit panel
+            // ('auto'). note: still always starts closed when page loads.
+            open: 'auto',
+            // if list item is more than this many characters, text will be
+            // truncated
+            charLimit: '50',
+            // whether or not to show bullets next to each toc item
+            bullets: 'false',
+            // whether plugin is on or not
+            enabled: 'true'
+        };
+
+        // change options above, or override with url parameter, eg:
+        // 'manuscript.html?pluginName-enabled=false'
+
+        // /////////////////////////
+        // SCRIPT
+        // /////////////////////////
+
+        // start script
+        function start() {
+            // make toc panel and populate with entries (links to document
+            // sections)
+            const panel = makePanel();
+            if (!panel)
+                return;
+            makeEntries(panel);
+            document.body.insertBefore(panel, document.body.firstChild);
+
+            closePanel();
+
+            // attach click, scroll, and hash change listeners to window
+            window.addEventListener('click', onClick);
+            window.addEventListener('touchstart', onClick);
+            window.addEventListener('scroll', onScroll);
+            window.addEventListener('hashchange', onScroll);
+            window.addEventListener('keyup', onKeyUp);
+            onScroll();
+
+            // add class to push document body down out of way of toc button
+            document.body.classList.add('toc_body_nudge');
+        }
+
+        // determine if screen wide enough to fit toc panel
+        function isSmallScreen() {
+            // in default theme:
+            // 816px = 8.5in = width of "page" (<body>) element
+            // 260px = min width of toc panel (*2 for both sides of <body>)
+            return window.innerWidth < 816 + 260 * 2;
+        }
+
+        // open/close panel based on option and screen size
+        function openOrClosePanel() {
+            if (
+                options.open === 'true' ||
+                (options.open === 'auto' && !isSmallScreen())
+            )
+                openPanel();
+            else
+                closePanel();
+        }
+
+        // when mouse is clicked anywhere in window
+        function onClick() {
+            const panel = document.getElementById('toc_panel');
+            if (!panel)
+                return;
+
+            if (panel.dataset.open === 'true')
+                openOrClosePanel();
+        }
+
+        // when window is scrolled or hash changed
+        function onScroll() {
+            highlightViewed();
+        }
+
+        // when key pressed
+        function onKeyUp(event) {
+            if (!event || !event.key)
+                return;
+
+            // close on esc
+            if (event.key === 'Escape')
+                closePanel();
+        }
+
+        // find entry of currently viewed document section in toc and highlight
+        function highlightViewed() {
+            const firstId = getFirstInView(options.typesQuery);
+
+            // get toc entries (links), unhighlight all, then highlight viewed
+            const list = document.getElementById('toc_list');
+            if (!firstId || !list)
+                return;
+            const links = list.querySelectorAll('a');
+            for (const link of links)
+                link.dataset.viewing = 'false';
+            const link = list.querySelector('a[href="#' + firstId + '"]');
+            if (!link)
+                return;
+            link.dataset.viewing = 'true';
+        }
+
+        // get first or previous toc listed element in top half of view
+        function getFirstInView(query) {
+            // get all elements matching query and with id
+            const elements = document.querySelectorAll(query);
+            const elementsWithIds = [];
+            for (const element of elements) {
+                if (element.id)
+                    elementsWithIds.push(element);
+            }
+
+
+            // get first or previous element in top half of view
+            for (let i = 0; i < elementsWithIds.length; i++) {
+                const element = elementsWithIds[i];
+                const prevElement = elementsWithIds[Math.max(0, i - 1)];
+                if (element.getBoundingClientRect().top >= 0) {
+                    if (
+                        element.getBoundingClientRect().top <
+                        window.innerHeight / 2
+                    )
+                        return element.id;
+                    else
+                        return prevElement.id;
+                }
+            }
+        }
+
+        // make panel
+        function makePanel() {
+            // create panel
+            const panel = document.createElement('div');
+            panel.id = 'toc_panel';
+            if (options.bullets === 'true')
+                panel.dataset.bullets = 'true';
+
+            // create header
+            const header = document.createElement('div');
+            header.id = 'toc_header';
+
+            // create toc button
+            const button = document.createElement('button');
+            button.id = 'toc_button';
+            button.innerHTML = document.querySelector(
+                '.icon_th_list'
+            ).innerHTML;
+            button.classList.add('icon_button');
+
+            // create header text
+            const text = document.createElement('h3');
+            text.innerHTML = 'Table of Contents';
+
+            // create container for toc list
+            const list = document.createElement('div');
+            list.id = 'toc_list';
+
+            // attach click listeners
+            panel.addEventListener('click', onPanelClick);
+            header.addEventListener('click', onHeaderClick);
+            button.addEventListener('click', onButtonClick);
+
+            // attach elements
+            header.appendChild(button);
+            header.appendChild(text);
+            panel.appendChild(header);
+            panel.appendChild(list);
+
+            return panel;
+        }
+
+        // create toc entries (links) to each element of the specified types
+        function makeEntries(panel) {
+            const elements = document.querySelectorAll(options.typesQuery);
+            for (const element of elements) {
+                // do not add link if element doesn't have assigned id
+                if (!element.id)
+                    continue;
+
+                // create link/list item
+                const link = document.createElement('a');
+                link.classList.add('toc_link');
+                switch (element.tagName.toLowerCase()) {
+                    case 'h1':
+                        link.dataset.level = '1';
+                        break;
+                    case 'h2':
+                        link.dataset.level = '2';
+                        break;
+                    case 'h3':
+                        link.dataset.level = '3';
+                        break;
+                    case 'h4':
+                        link.dataset.level = '4';
+                        break;
+                }
+                link.title = element.innerText;
+                let text = element.innerText;
+                if (text.length > options.charLimit)
+                    text = text.slice(0, options.charLimit) + '...';
+                link.innerHTML = text;
+                link.href = '#' + element.id;
+                link.addEventListener('click', onLinkClick);
+
+                // attach link
+                panel.querySelector('#toc_list').appendChild(link);
+            }
+        }
+
+        // when panel is clicked
+        function onPanelClick(event) {
+            // stop click from propagating to window/document and closing panel
+            event.stopPropagation();
+        }
+
+        // when header itself is clicked
+        function onHeaderClick(event) {
+            togglePanel();
+        }
+
+        // when button is clicked
+        function onButtonClick(event) {
+            togglePanel();
+            // stop header underneath button from also being clicked
+            event.stopPropagation();
+        }
+
+        // when link is clicked
+        function onLinkClick() {
+            openOrClosePanel();
+        }
+
+        // open panel if closed, close if opened
+        function togglePanel() {
+            const panel = document.getElementById('toc_panel');
+            if (!panel)
+                return;
+
+            if (panel.dataset.open === 'true')
+                closePanel();
+            else
+                openPanel();
+        }
+
+        // open panel
+        function openPanel() {
+            const panel = document.getElementById('toc_panel');
+            if (panel)
+                panel.dataset.open = 'true';
+        }
+
+        // close panel
+        function closePanel() {
+            const panel = document.getElementById('toc_panel');
+            if (panel)
+                panel.dataset.open = 'false';
+        }
+
+        // load options from url parameters
+        function loadOptions() {
+            const url = window.location.search;
+            const params = new URLSearchParams(url);
+            for (const optionName of Object.keys(options)) {
+                const paramName = pluginName + '-' + optionName;
+                const param = params.get(paramName);
+                if (param !== '' && param !== null)
+                    options[optionName] = param;
+            }
+        }
+        loadOptions();
+
+        // start script when document is finished loading
+        if (options.enabled === 'true')
+            window.addEventListener('load', start);
+    })();
+</script>
+
+<!-- th list icon -->
+
+<template class="icon_th_list">
+    <!-- modified from: https://fontawesome.com/icons/th-list -->
+    <svg width="16" height="16" viewBox="0 0 512 512" tabindex="-1">
+        <path
+            fill="currentColor"
+            d="M96 96c0 26.51-21.49 48-48 48S0 122.51 0 96s21.49-48 48-48 48 21.49 48 48zM48 208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm0 160c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm96-236h352c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H144c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h352c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H144c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h352c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H144c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"
+            tabindex="-1"
+        ></path>
+    </svg>
+</template>
+<!-- lightbox plugin -->
+
+<script>
+    (function() {
+        // /////////////////////////
+        // DESCRIPTION
+        // /////////////////////////
+
+        // This Manubot plugin makes it such that when a user clicks on an
+        // image, the image fills the screen and the user can pan/drag/zoom
+        // the image and navigate between other images in the document.
+
+        // /////////////////////////
+        // OPTIONS
+        // /////////////////////////
+
+        // plugin name prefix for url parameters
+        const pluginName = 'lightbox';
+
+        // default plugin options
+        const options = {
+            // list of possible zoom/scale factors
+            zoomSteps:
+                '0.1, 0.25, 0.333333, 0.5, 0.666666, 0.75, 1,' +
+                '1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8',
+            // whether to fit image to view ('fit'), display at 100% and shrink
+            // if necessary ('shrink'), or always display at 100% ('100')
+            defaultZoom: 'fit',
+            // whether to zoom in/out toward center of view ('true') or mouse
+            // ('false')
+            centerZoom: 'false',
+            // whether plugin is on or not
+            enabled: 'true'
+        };
+
+        // change options above, or override with url parameter, eg:
+        // 'manuscript.html?pluginName-enabled=false'
+
+        // /////////////////////////
+        // SCRIPT
+        // /////////////////////////
+
+        // start script
+        function start() {
+            // run through each <img> element
+            const imgs = document.querySelectorAll('figure > img');
+            let count = 1;
+            for (const img of imgs) {
+                img.classList.add('lightbox_document_img');
+                img.dataset.number = count;
+                img.dataset.total = imgs.length;
+                img.addEventListener('click', openLightbox);
+                count++;
+            }
+
+            // attach mouse and key listeners to window
+            window.addEventListener('mousemove', onWindowMouseMove);
+            window.addEventListener('keyup', onKeyUp);
+        }
+
+        // when mouse is moved anywhere in window
+        function onWindowMouseMove(event) {
+            window.mouseX = event.clientX;
+            window.mouseY = event.clientY;
+        }
+
+        // when key pressed
+        function onKeyUp(event) {
+            if (!event || !event.key)
+                return;
+
+            switch (event.key) {
+                // trigger click of prev button
+                case 'ArrowLeft':
+                    const prevButton = document.getElementById(
+                        'lightbox_prev_button'
+                    );
+                    if (prevButton)
+                        prevButton.click();
+                    break;
+                // trigger click of next button
+                case 'ArrowRight':
+                    const nextButton = document.getElementById(
+                        'lightbox_next_button'
+                    );
+                    if (nextButton)
+                        nextButton.click();
+                    break;
+                // close on esc
+                case 'Escape':
+                    closeLightbox();
+                    break;
+            }
+        }
+
+        // open lightbox
+        function openLightbox() {
+            const lightbox = makeLightbox(this);
+            if (!lightbox)
+                return;
+
+            blurBody(lightbox);
+            document.body.appendChild(lightbox);
+        }
+
+        // make lightbox
+        function makeLightbox(img) {
+            // delete lightbox if it exists, start fresh
+            closeLightbox();
+
+            // create screen overlay containing lightbox
+            const overlay = document.createElement('div');
+            overlay.id = 'lightbox_overlay';
+
+            // create image info boxes
+            const numberInfo = document.createElement('div');
+            const zoomInfo = document.createElement('div');
+            numberInfo.id = 'lightbox_number_info';
+            zoomInfo.id = 'lightbox_zoom_info';
+
+            // create container for image
+            const imageContainer = document.createElement('div');
+            imageContainer.id = 'lightbox_image_container';
+            const lightboxImg = makeLightboxImg(
+                img,
+                imageContainer,
+                numberInfo,
+                zoomInfo
+            );
+            imageContainer.appendChild(lightboxImg);
+
+            // create bottom container for caption and navigation buttons
+            const bottomContainer = document.createElement('div');
+            bottomContainer.id = 'lightbox_bottom_container';
+            const caption = makeCaption(img);
+            const prevButton = makePrevButton(img);
+            const nextButton = makeNextButton(img);
+            bottomContainer.appendChild(prevButton);
+            bottomContainer.appendChild(caption);
+            bottomContainer.appendChild(nextButton);
+
+            // attach top middle and bottom to overlay
+            overlay.appendChild(numberInfo);
+            overlay.appendChild(zoomInfo);
+            overlay.appendChild(imageContainer);
+            overlay.appendChild(bottomContainer);
+
+            return overlay;
+        }
+
+        // make <img> object that is intuitively draggable and zoomable
+        function makeLightboxImg(
+            sourceImg,
+            container,
+            numberInfoBox,
+            zoomInfoBox
+        ) {
+            // create copy of source <img>
+            const img = sourceImg.cloneNode(true);
+            img.classList.remove('lightbox_document_img');
+            img.removeAttribute('id');
+            img.removeAttribute('width');
+            img.removeAttribute('height');
+            img.style.position = 'unset';
+            img.style.margin = '0';
+            img.style.padding = '0';
+            img.style.width = '';
+            img.style.height = '';
+            img.style.minWidth = '';
+            img.style.minHeight = '';
+            img.style.maxWidth = '';
+            img.style.maxHeight = '';
+            img.id = 'lightbox_img';
+
+            // build sorted list of unique zoomSteps, always including a 100%
+            let zoomSteps = [];
+            const optionsZooms = options.zoomSteps.split(/[^0-9.]/);
+            for (const optionZoom of optionsZooms) {
+                const newZoom = parseFloat(optionZoom);
+                if (newZoom && !zoomSteps.includes(newZoom))
+                    zoomSteps.push(newZoom);
+            }
+            if (!zoomSteps.includes(1))
+                zoomSteps.push(1);
+            zoomSteps = zoomSteps.sort(function sortNumber(a, b) {
+                return a - b;
+            });
+
+            // <img> object property variables
+            let zoom = 1;
+            let translateX = 0;
+            let translateY = 0;
+            let clickMouseX = undefined;
+            let clickMouseY = undefined;
+            let clickTranslateX = undefined;
+            let clickTranslateY = undefined;
+
+            updateNumberInfo();
+
+            // update image numbers displayed in info box
+            function updateNumberInfo() {
+                numberInfoBox.innerHTML =
+                    sourceImg.dataset.number + ' of ' + sourceImg.dataset.total;
+            }
+
+            // update zoom displayed in info box
+            function updateZoomInfo() {
+                let zoomInfo = zoom * 100;
+                if (!Number.isInteger(zoomInfo))
+                    zoomInfo = zoomInfo.toFixed(2);
+                zoomInfoBox.innerHTML = zoomInfo + '%';
+            }
+
+            // move to closest zoom step above current zoom
+            const zoomIn = function() {
+                for (const zoomStep of zoomSteps) {
+                    if (zoomStep > zoom) {
+                        zoom = zoomStep;
+                        break;
+                    }
+                }
+                updateTransform();
+            };
+
+            // move to closest zoom step above current zoom
+            const zoomOut = function() {
+                zoomSteps.reverse();
+                for (const zoomStep of zoomSteps) {
+                    if (zoomStep < zoom) {
+                        zoom = zoomStep;
+                        break;
+                    }
+                }
+                zoomSteps.reverse();
+
+                updateTransform();
+            };
+
+            // update display of <img> based on scale/translate properties
+            const updateTransform = function() {
+                // set transform
+                img.style.transform =
+                    'translate(' +
+                    (translateX || 0) +
+                    'px,' +
+                    (translateY || 0) +
+                    'px) scale(' +
+                    (zoom || 1) +
+                    ')';
+
+                // get new width/height after scale
+                const rect = img.getBoundingClientRect();
+                // limit translate
+                translateX = Math.max(translateX, -rect.width / 2);
+                translateX = Math.min(translateX, rect.width / 2);
+                translateY = Math.max(translateY, -rect.height / 2);
+                translateY = Math.min(translateY, rect.height / 2);
+
+                // set transform
+                img.style.transform =
+                    'translate(' +
+                    (translateX || 0) +
+                    'px,' +
+                    (translateY || 0) +
+                    'px) scale(' +
+                    (zoom || 1) +
+                    ')';
+
+                updateZoomInfo();
+            };
+
+            // fit <img> to container
+            const fit = function() {
+                // no x/y offset, 100% zoom by default
+                translateX = 0;
+                translateY = 0;
+                zoom = 1;
+
+                // widths of <img> and container
+                const imgWidth = img.naturalWidth;
+                const imgHeight = img.naturalHeight;
+                const containerWidth = parseFloat(
+                    window.getComputedStyle(container).width
+                );
+                const containerHeight = parseFloat(
+                    window.getComputedStyle(container).height
+                );
+
+                // how much zooming is needed to fit <img> to container
+                const xRatio = imgWidth / containerWidth;
+                const yRatio = imgHeight / containerHeight;
+                const maxRatio = Math.max(xRatio, yRatio);
+                const newZoom = 1 / maxRatio;
+
+                // fit <img> to container according to option
+                if (options.defaultZoom === 'shrink') {
+                    if (maxRatio > 1)
+                        zoom = newZoom;
+                } else if (options.defaultZoom === 'fit')
+                    zoom = newZoom;
+
+                updateTransform();
+            };
+
+            // when mouse wheel is rolled anywhere in container
+            const onContainerWheel = function(event) {
+                if (!event)
+                    return;
+
+                // let ctrl + mouse wheel to zoom behave as normal
+                if (event.ctrlKey)
+                    return;
+
+                // prevent normal scroll behavior
+                event.preventDefault();
+                event.stopPropagation();
+
+                // point around which to scale img
+                const viewRect = container.getBoundingClientRect();
+                const viewX = (viewRect.left + viewRect.right) / 2;
+                const viewY = (viewRect.top + viewRect.bottom) / 2;
+                const originX = options.centerZoom === 'true' ? viewX : mouseX;
+                const originY = options.centerZoom === 'true' ? viewY : mouseY;
+
+                // get point on image under origin
+                const oldRect = img.getBoundingClientRect();
+                const oldPercentX = (originX - oldRect.left) / oldRect.width;
+                const oldPercentY = (originY - oldRect.top) / oldRect.height;
+
+                // increment/decrement zoom
+                if (event.deltaY < 0)
+                    zoomIn();
+                if (event.deltaY > 0)
+                    zoomOut();
+
+                // get offset between previous image point and origin
+                const newRect = img.getBoundingClientRect();
+                const offsetX =
+                    originX - (newRect.left + newRect.width * oldPercentX);
+                const offsetY =
+                    originY - (newRect.top + newRect.height * oldPercentY);
+
+                // translate image to keep image point under origin
+                translateX += offsetX;
+                translateY += offsetY;
+
+                // perform translate
+                updateTransform();
+            };
+
+            // when container is clicked
+            function onContainerClick(event) {
+                // if container itself is target of click, and not other
+                // element above it
+                if (event.target === this)
+                    closeLightbox();
+            }
+
+            // when mouse button is pressed on image
+            const onImageMouseDown = function(event) {
+                // store original mouse position relative to image
+                clickMouseX = window.mouseX;
+                clickMouseY = window.mouseY;
+                clickTranslateX = translateX;
+                clickTranslateY = translateY;
+                event.stopPropagation();
+                event.preventDefault();
+            };
+
+            // when mouse button is released anywhere in window
+            const onWindowMouseUp = function(event) {
+                // reset original mouse position
+                clickMouseX = undefined;
+                clickMouseY = undefined;
+                clickTranslateX = undefined;
+                clickTranslateY = undefined;
+
+                // remove global listener if lightbox removed from document
+                if (!document.body.contains(container))
+                    window.removeEventListener('mouseup', onWindowMouseUp);
+            };
+
+            // when mouse is moved anywhere in window
+            const onWindowMouseMove = function(event) {
+                if (
+                    clickMouseX === undefined ||
+                    clickMouseY === undefined ||
+                    clickTranslateX === undefined ||
+                    clickTranslateY === undefined
+                )
+                    return;
+
+                // offset image based on original and current mouse position
+                translateX = clickTranslateX + window.mouseX - clickMouseX;
+                translateY = clickTranslateY + window.mouseY - clickMouseY;
+                updateTransform();
+                event.preventDefault();
+
+                // remove global listener if lightbox removed from document
+                if (!document.body.contains(container))
+                    window.removeEventListener('mousemove', onWindowMouseMove);
+            };
+
+            // when window is resized
+            const onWindowResize = function(event) {
+                fit();
+
+                // remove global listener if lightbox removed from document
+                if (!document.body.contains(container))
+                    window.removeEventListener('resize', onWindowResize);
+            };
+
+            // attach the necessary event listeners
+            img.addEventListener('dblclick', fit);
+            img.addEventListener('mousedown', onImageMouseDown);
+            container.addEventListener('wheel', onContainerWheel);
+            container.addEventListener('mousedown', onContainerClick);
+            container.addEventListener('touchstart', onContainerClick);
+            window.addEventListener('mouseup', onWindowMouseUp);
+            window.addEventListener('mousemove', onWindowMouseMove);
+            window.addEventListener('resize', onWindowResize);
+
+            // run fit() after lightbox atttached to document and <img> Loaded
+            // so needed container and img dimensions available
+            img.addEventListener('load', fit);
+
+            return img;
+        }
+
+        // make caption
+        function makeCaption(img) {
+            const caption = document.createElement('div');
+            caption.id = 'lightbox_caption';
+            const captionSource = img.nextElementSibling;
+            if (captionSource.tagName.toLowerCase() === 'figcaption') {
+                const captionCopy = makeCopy(captionSource);
+                caption.innerHTML = captionCopy.innerHTML;
+            }
+
+            caption.addEventListener('touchstart', function(event) {
+                event.stopPropagation();
+            });
+
+            return caption;
+        }
+
+        // make carbon copy of html dom element
+        function makeCopy(source) {
+            const sourceCopy = source.cloneNode(true);
+
+            // delete elements marked with ignore (eg anchor and jump buttons)
+            const deleteFromCopy = sourceCopy.querySelectorAll(
+                '[data-ignore="true"]'
+            );
+            for (const element of deleteFromCopy)
+                element.remove();
+
+            // delete certain element attributes
+            const attributes = [
+                'id',
+                'data-collapsed',
+                'data-selected',
+                'data-highlighted',
+                'data-glow'
+            ];
+            for (const attribute of attributes) {
+                sourceCopy.removeAttribute(attribute);
+                const elements = sourceCopy.querySelectorAll(
+                    '[' + attribute + ']'
+                );
+                for (const element of elements)
+                    element.removeAttribute(attribute);
+            }
+
+            return sourceCopy;
+        }
+
+        // make button to jump to previous image in document
+        function makePrevButton(img) {
+            const prevButton = document.createElement('button');
+            prevButton.id = 'lightbox_prev_button';
+            prevButton.title = 'Jump to the previous image in the document [←]';
+            prevButton.classList.add('icon_button', 'lightbox_button');
+            prevButton.innerHTML = document.querySelector(
+                '.icon_caret_left'
+            ).innerHTML;
+
+            // attach click listeners to button
+            prevButton.addEventListener('click', function() {
+                getPrevImg(img).click();
+            });
+
+            return prevButton;
+        }
+
+        // make button to jump to next image in document
+        function makeNextButton(img) {
+            const nextButton = document.createElement('button');
+            nextButton.id = 'lightbox_next_button';
+            nextButton.title = 'Jump to the next image in the document [→]';
+            nextButton.classList.add('icon_button', 'lightbox_button');
+            nextButton.innerHTML = document.querySelector(
+                '.icon_caret_right'
+            ).innerHTML;
+
+            // attach click listeners to button
+            nextButton.addEventListener('click', function() {
+                getNextImg(img).click();
+            });
+
+            return nextButton;
+        }
+
+        // get previous image in document
+        function getPrevImg(img) {
+            const imgs = document.querySelectorAll('.lightbox_document_img');
+
+            // find index of provided img
+            let index;
+            for (index = 0; index < imgs.length; index++) {
+                if (imgs[index] === img)
+                    break;
+            }
+
+
+            // wrap index to other side if < 1
+            if (index - 1 >= 0)
+                index--;
+            else
+                index = imgs.length - 1;
+            return imgs[index];
+        }
+
+        // get next image in document
+        function getNextImg(img) {
+            const imgs = document.querySelectorAll('.lightbox_document_img');
+
+            // find index of provided img
+            let index;
+            for (index = 0; index < imgs.length; index++) {
+                if (imgs[index] === img)
+                    break;
+            }
+
+
+            // wrap index to other side if > total
+            if (index + 1 <= imgs.length - 1)
+                index++;
+            else
+                index = 0;
+            return imgs[index];
+        }
+
+        // close lightbox
+        function closeLightbox() {
+            focusBody();
+
+            const lightbox = document.getElementById('lightbox_overlay');
+            if (lightbox)
+                lightbox.remove();
+        }
+
+        // make all elements behind lightbox non-focusable
+        function blurBody(overlay) {
+            const all = document.querySelectorAll('*');
+            for (const element of all)
+                element.tabIndex = -1;
+            document.body.classList.add('body_no_scroll');
+        }
+
+        // make all elements focusable again
+        function focusBody() {
+            const all = document.querySelectorAll('*');
+            for (const element of all)
+                element.removeAttribute('tabIndex');
+            document.body.classList.remove('body_no_scroll');
+        }
+
+        // load options from url parameters
+        function loadOptions() {
+            const url = window.location.search;
+            const params = new URLSearchParams(url);
+            for (const optionName of Object.keys(options)) {
+                const paramName = pluginName + '-' + optionName;
+                const param = params.get(paramName);
+                if (param !== '' && param !== null)
+                    options[optionName] = param;
+            }
+        }
+        loadOptions();
+
+        // start script when document is finished loading
+        if (options.enabled === 'true')
+            window.addEventListener('load', start);
+    })();
+</script>
+
+<!-- caret left icon -->
+
+<template class="icon_caret_left">
+    <!-- modified from: https://fontawesome.com/icons/caret-left -->
+    <svg width="16" height="16" viewBox="0 0 192 512">
+        <path
+            fill="currentColor"
+            d="M192 127.338v257.324c0 17.818-21.543 26.741-34.142 14.142L29.196 270.142c-7.81-7.81-7.81-20.474 0-28.284l128.662-128.662c12.599-12.6 34.142-3.676 34.142 14.142z"
+        ></path>
+    </svg>
+</template>
+
+<!-- caret right icon -->
+
+<template class="icon_caret_right">
+    <!-- modified from: https://fontawesome.com/icons/caret-right -->
+    <svg width="16" height="16" viewBox="0 0 192 512">
+        <path
+            fill="currentColor"
+            d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"
+        ></path>
+    </svg>
+</template>
+<!-- math plugin configuration -->
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        "CommonHTML": { linebreaks: { automatic: true } },
+        "HTML-CSS": { linebreaks: { automatic: true } },
+        "SVG": { linebreaks: { automatic: true } },
+        "fast-preview": { disabled: true }
+    });
+</script>
+
+<!-- math plugin -->
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML'>
+    // /////////////////////////
+    // DESCRIPTION
+    // /////////////////////////
+
+    // This third-party plugin 'MathJax' allows the proper rendering of
+    // math/equations written in LaTeX.
+
+    // https://www.mathjax.org/
+</script>
+<!-- annotations plugin configuration -->
+
+<script>
+    window.hypothesisConfig = function() {
+        return {
+            branding: {
+                accentColor: '#2196f3',
+                appBackgroundColor: '#f8f8f8',
+                ctaBackgroundColor: '#f8f8f8',
+                ctaTextColor: '#000000',
+                selectionFontFamily: 'Open Sans, Helvetica, sans serif',
+                annotationFontFamily: 'Open Sans, Helvetica, sans serif'
+            }
+        };
+    };
+</script>
+
+<!-- annotations plugin -->
+
+<script src='https://hypothes.is/embed.js'>
+    // /////////////////////////
+    // DESCRIPTION
+    // /////////////////////////
+
+    // This third-party plugin 'Hypothesis' allows public annotation of the
+    // manuscript.
+
+    // https://web.hypothes.is/
+</script>
+<!-- analytics plugin -->
+
+<!-- copy and paste code from Google Analytics or similar service here -->
+</body>
+</html>

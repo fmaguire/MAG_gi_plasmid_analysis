@@ -1,0 +1,26 @@
+[
+{
+  "id": "url:sickle",
+  "type": "software",
+  "URL": "https://github.com/najoshi/sickle",
+  "title": "Sickle: A sliding-window, adaptive, quality-based trimming tool for FastQ files",
+  "container-title": "GitHub",
+  "issued": {
+    "date-parts": [
+      [
+        2011
+      ]
+    ]
+  },
+  "author": [
+    {
+      "given": "NA",
+      "family": "Joshi"
+    },
+    {
+      "given": "JN",
+      "family": "Fass"
+    }
+  ]
+}
+]

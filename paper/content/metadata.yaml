@@ -8,7 +8,7 @@ lang: en-CA
 author_info:
   -
     github: fmaguire
-    name: Finlay Maguire
+    name: Finlay Maguire*
     initials: FM
     orcid: 0000-0002-1203-9514
     twitter: fmaguire
@@ -20,10 +20,24 @@ author_info:
       - Donald Hill Family Fellowship
   -
     github: imasianxd
-    name: Baofeng Jia
+    name: Baofeng Jia*
     initials: BJ
     orcid: XXXX-XXXX-XXXX-XXXX
     email: jjia@sfu.ca
+    affiliations:
+      - Department of Biochemistry and Molecular Biology, Simon Fraser University
+  -
+    name: Kristen Gray
+    initials: KG
+    orcid: XXXX-XXXX-XXXX-XXXX
+    email: kristen.leanne252@gmail.com
+    affiliations:
+      - Department of Biochemistry and Molecular Biology, Simon Fraser University
+  -
+    name: Venus Lau
+    initials: VL
+    orcid: XXXX-XXXX-XXXX-XXXX
+    email: venus_lau@sfu.ca 
     affiliations:
       - Department of Biochemistry and Molecular Biology, Simon Fraser University
   -
