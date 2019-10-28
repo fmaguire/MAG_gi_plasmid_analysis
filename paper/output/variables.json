@@ -1,0 +1,102 @@
+{
+  "date": "October 28, 2019",
+  "authors": [
+    {
+      "github": "fmaguire",
+      "name": "Finlay Maguire*",
+      "initials": "FM",
+      "orcid": "0000-0002-1203-9514",
+      "twitter": "fmaguire",
+      "email": "finlaymaguire@gmail.com",
+      "affiliations": [
+        "Faculty of Computer Science, Dalhousie University"
+      ],
+      "funders": [
+        "Genome Canada",
+        "Donald Hill Family Fellowship"
+      ],
+      "affiliation_numbers": [
+        1
+      ]
+    },
+    {
+      "github": "imasianxd",
+      "name": "Baofeng Jia*",
+      "initials": "BJ",
+      "orcid": "XXXX-XXXX-XXXX-XXXX",
+      "email": "jjia@sfu.ca",
+      "affiliations": [
+        "Department of Biochemistry and Molecular Biology, Simon Fraser University"
+      ],
+      "affiliation_numbers": [
+        2
+      ]
+    },
+    {
+      "name": "Kristen Gray",
+      "initials": "KG",
+      "orcid": "XXXX-XXXX-XXXX-XXXX",
+      "email": "kristen.leanne252@gmail.com",
+      "affiliations": [
+        "Department of Biochemistry and Molecular Biology, Simon Fraser University"
+      ],
+      "affiliation_numbers": [
+        2
+      ]
+    },
+    {
+      "name": "Venus Lau",
+      "initials": "VL",
+      "orcid": "XXXX-XXXX-XXXX-XXXX",
+      "email": "venus_lau@sfu.ca",
+      "affiliations": [
+        "Department of Biochemistry and Molecular Biology, Simon Fraser University"
+      ],
+      "affiliation_numbers": [
+        2
+      ]
+    },
+    {
+      "name": "Robert G. Beiko",
+      "initials": "RGB",
+      "email": "rbeiko@dal.ca",
+      "affiliations": [
+        "Faculty of Computer Science, Dalhousie University"
+      ],
+      "affiliation_numbers": [
+        1
+      ]
+    },
+    {
+      "name": "Fiona S.L. Brinkman",
+      "initials": "FSLB",
+      "orcid": "XXXX-XXXX-XXXX-XXXX",
+      "email": "fionabrinkman@sfu.ca",
+      "affiliations": [
+        "Department of Biochemistry and Molecular Biology, Simon Fraser University"
+      ],
+      "affiliation_numbers": [
+        2
+      ]
+    }
+  ],
+  "affiliations": [
+    {
+      "affiliation": "Faculty of Computer Science, Dalhousie University",
+      "affiliation_number": 1
+    },
+    {
+      "affiliation": "Department of Biochemistry and Molecular Biology, Simon Fraser University",
+      "affiliation_number": 2
+    }
+  ],
+  "manuscript_stats": {
+    "reference_counts": {
+      "doi": 51,
+      "pmid": 2,
+      "url": 1,
+      "total": 54
+    },
+    "word_count": 4447
+  }
+}
