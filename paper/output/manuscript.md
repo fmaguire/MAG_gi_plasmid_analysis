@@ -6,7 +6,7 @@ author-meta:
 - Venus Lau
 - Robert G. Beiko
 - Fiona S.L. Brinkman
-date-meta: '2019-10-28'
+date-meta: '2019-10-29'
 keywords:
 - markdown
 - publishing
@@ -24,7 +24,7 @@ title: Metagenome-Assembled Genome Binning Methods Disproportionately Fail for P
 <small><em>
 This manuscript
 was automatically generated
-on October 28, 2019.
+on October 29, 2019.
 </em></small>
 
 ## Authors
@@ -243,6 +243,10 @@ In terms of overall correct binning with the chromosomes from the same genome th
 
 ![Genomic Island Coverage](images/3_gi_coverage.png){#fig:3gis}
 
+Switching over to gene content, we first explored the ability to find open reading frames (ORFs) within MAGs. Overall, the total number of predicted ORFs in MAGs followed a similar trend fo the chromosomal coverage and purity (@fig:13geneContent). Of the 4 binning tools, CONCOCT performed the worst, finding <30% of the number of ORFs in our reference genomes. Metabat2 performed second worst at ~80%. DASTool recovered a similar number to our reference and Maxbin2 seemed to predicted 7-46% more genes. The Assembler method did not significantly impact the number of genes predited with the exception of Maxbin2 in which idba_ud was the closest to reference and metaspades predicted 46% more ORFs. 
+
+![Predicted Gene Content](images/13geneContent.png){#fig:13geneContent}
+
 With respect to AMR genes, in total, MAGs were only able to recover between 40-53% of the AMR genes predicted in our reference genomes across all assembler-binner pairs (Fig. (@fig:4MAGBinTotal)). We then took the best assembler-binner pair (MegaHit-DasTools) and examined the AMR genes recovered in detail. We noticed that, for majority of the bins (85%), MAGs were able to correctly recover either 100% or 0% of the AMR genes (Median value 100%) that are contained in the reference chromosome assigned to that bin. However, MAGs were not able to correctly recover any of the AMR genes that were present on plasmids (Fig. (@fig:5MAGDMBinTotal), Fig. (@fig:6AMRGenePercentRecovery)). Lastly, we asked the question of where reference replicon AMR genes went in the MAGs. For chromosome, majority (81%) of the AMR genes was found in a bin of the MAG. A small portion (12%) was left unbinned and 7% were not found in MAGs at all. On the other hand, for plasmid born AMR genes, all of the recovered genes (n=20) were identified in the unbinned fraction of our MAG (Fig. (@fig:7LocationOfReferenceGenomeAMR)).  
 
 ![Total AMR Genes Detected Across Tools](images/4MAGBinTotal.png){#fig:4MAGBinTotal}
@@ -271,6 +275,8 @@ In this paper, we evaluated the ability and accuracy of metagenome-assembled gen
 Overall, the best assembler-binner pair was megahit-DASTOOL in term of both chromosomal coverage (94.3%) and bin purity (1). Looking at genomes with the lowest coverage, the 3 Streptococcus genomes were particularly problematic, likely due to their similarity, with the best recovery for each ranging from 1.7% to 47.49%. This suggest that MAGs might not be able to distinguish between closely related species (COMMENT: Point 1, MAGs cannot distinguish closely related species). While CONCOCT performed significantly worse compared to the other binners, we did notice that CONCOCT seems to display a trend of generating lots of small partial bins. Perhaps CONCOCT bins might be able to distinguish between closely related species to a higher resolution (COMMENT: Small partial bins… what does it mean overall. is this assumption correct? Would it be able to distinguish closely related species?)
 
 While the overall recovery of chromosomes was okay, we were interested in MAG’s ability to correctly bin mobile genetic elements due to their importance in the functions and spread of pathogenic traits such as AMR and virulence. In term of plasmids, a very small proportion of plasmids were correctly binned regardless of the method (<33% at best). Similarly, the same trend exists for genomic islands (<43.3%). This poor result is not unexpected as genomic islands and plasmids have divergent composition features relative to the chromosomes. Furthermore, the difference between the percentages suggest that binning plasmids are harder than GIs. This difference might be due to the problem of plasmid assembly. Therefore, the binning efficiency might improve if we use an assembler targeted at assembling plasmids [@12zFifp5x].
+
+Looking at predicted gene content, our best assembler-binner pair produced a similar number of predicted ORFs as our reference genomes. (interestingly we still missed a bunch of AMR genes. perhaps theses predicted ORFs are fragmented? idk need ideas)
 
 Due to the importance of mobile genetic elements to disseminate clinically relevant antimicrobial resistance genes and virulence factors, we explored whether or not MAGs can be used to provide useful lateral gene transfer insights. 
 
