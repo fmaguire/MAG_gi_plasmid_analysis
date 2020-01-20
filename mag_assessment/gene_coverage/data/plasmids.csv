@@ -1,0 +1,37 @@
+,assembly,binner,Category,% of Plasmids (>50% coverage)
+0,idba_ud,concoct,Assembled,27.692307692307693
+1,idba_ud,dastool,Assembled,27.692307692307693
+2,idba_ud,maxbin2,Assembled,27.692307692307693
+3,idba_ud,metabat2,Assembled,27.692307692307693
+4,megahit,concoct,Assembled,36.92307692307693
+5,megahit,dastool,Assembled,36.92307692307693
+6,megahit,maxbin2,Assembled,36.92307692307693
+7,megahit,metabat2,Assembled,36.92307692307693
+8,metaspades,concoct,Assembled,66.15384615384615
+9,metaspades,dastool,Assembled,66.15384615384615
+10,metaspades,maxbin2,Assembled,66.15384615384615
+11,metaspades,metabat2,Assembled,66.15384615384615
+12,idba_ud,concoct,Binned,27.692307692307693
+13,idba_ud,dastool,Binned,4.615384615384616
+14,idba_ud,maxbin2,Binned,27.692307692307693
+15,idba_ud,metabat2,Binned,6.153846153846154
+16,megahit,concoct,Binned,36.92307692307693
+17,megahit,dastool,Binned,6.153846153846154
+18,megahit,maxbin2,Binned,36.92307692307693
+19,megahit,metabat2,Binned,3.076923076923077
+20,metaspades,concoct,Binned,66.15384615384615
+21,metaspades,dastool,Binned,18.461538461538463
+22,metaspades,maxbin2,Binned,64.61538461538461
+23,metaspades,metabat2,Binned,6.153846153846154
+24,idba_ud,concoct,Correctly Binned,
+25,idba_ud,dastool,Correctly Binned,
+26,idba_ud,maxbin2,Correctly Binned,
+27,idba_ud,metabat2,Correctly Binned,
+28,megahit,concoct,Correctly Binned,
+29,megahit,dastool,Correctly Binned,
+30,megahit,maxbin2,Correctly Binned,
+31,megahit,metabat2,Correctly Binned,
+32,metaspades,concoct,Correctly Binned,
+33,metaspades,dastool,Correctly Binned,
+34,metaspades,maxbin2,Correctly Binned,
+35,metaspades,metabat2,Correctly Binned,

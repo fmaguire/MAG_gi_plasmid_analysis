@@ -1,0 +1,44 @@
+# Figure Replotting Information
+
+## Figure 1 
+data = top_hits_per_bin.csv
+y='species', x='coverage', hue='binner', order = ['Pelagibaca_abyssi', 'Streptococcus_macedonicus',
+'Streptococcus_constellatus', 'Acinetobacter_soli',
+'Methylobacterium_nodulans', 'Klebsiella_oxytoca',
+'Shigella_dysenteriae', 'Caulobacter_segnis', 'Pedobacter_steynii',
+'Lactobacillus_fermentum', 'Streptococcus_sp._I-G2',
+'Lactobacillus_paracollinoides', 'Synechococcus_sp._PCC_8807',
+'Acetobacter_pasteurianus', 'Actinomyces_sp._Marseille-P2985',
+'Chlamydia_pneumoniae', 'Bordetella_petrii', 'Shigella_flexneri',
+'Pseudomonas_syringae_group_genomosp._3', 'Lactobacillus_backii',
+'Akkermansia_muciniphila', 'Erwinia_sp._Ejp617',
+'Campylobacter_subantarcticus', 'Mycobacterium_gilvum',
+'Moraxella_osloensis', 'Lactobacillus_acidophilus',
+'Bacillus_thuringiensis', 'Clostridium_baratii', 'Paenibacillus_bovis',
+'Streptomyces_parvulus']
+
+
+## Figure 2
+
+data = top_hits_per_bin.csv
+
+hue_order = ['concoct', 'maxbin2', 'dastool', 'metabat2'], y='assembly', hue='binner', x='coverage'
+
+
+## Figure 3
+
+data = purity.csv 
+hue_order = ['concoct', 'maxbin2', 'dastool', 'metabat2'], x='assembly', hue='binner', y='species'
+
+
+## Figure 4
+
+data = plasmids.csv
+hue='Category', col='assembly', x = 'binner', y='% of Plasmids (>50% coverage)'
+
+
+## Figure 5 
+
+data = gi_data.csv
+hue='Category', col='assembly', x = 'binner', y='% of GIs (>50% Coverage)'
+
