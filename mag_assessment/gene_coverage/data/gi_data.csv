@@ -1,0 +1,37 @@
+,assembly,binner,Category,% of GIs (>50% Coverage)
+0,idba_ud,concoct,Assembled,37.85123966942149
+1,idba_ud,dastool,Assembled,37.85123966942149
+2,idba_ud,maxbin2,Assembled,37.85123966942149
+3,idba_ud,metabat2,Assembled,37.85123966942149
+4,megahit,concoct,Assembled,37.85123966942149
+5,megahit,dastool,Assembled,37.85123966942149
+6,megahit,maxbin2,Assembled,37.85123966942149
+7,megahit,metabat2,Assembled,37.85123966942149
+8,metaspades,concoct,Assembled,44.132231404958674
+9,metaspades,dastool,Assembled,44.132231404958674
+10,metaspades,maxbin2,Assembled,44.132231404958674
+11,metaspades,metabat2,Assembled,44.132231404958674
+12,idba_ud,concoct,Binned,37.85123966942149
+13,idba_ud,dastool,Binned,34.710743801652896
+14,idba_ud,maxbin2,Binned,36.36363636363637
+15,idba_ud,metabat2,Binned,33.22314049586777
+16,megahit,concoct,Binned,37.85123966942149
+17,megahit,dastool,Binned,31.074380165289256
+18,megahit,maxbin2,Binned,37.68595041322314
+19,megahit,metabat2,Binned,33.88429752066116
+20,metaspades,concoct,Binned,44.132231404958674
+21,metaspades,dastool,Binned,39.17355371900826
+22,metaspades,maxbin2,Binned,43.30578512396694
+23,metaspades,metabat2,Binned,39.50413223140496
+24,idba_ud,concoct,Correctly Binned,
+25,idba_ud,dastool,Correctly Binned,
+26,idba_ud,maxbin2,Correctly Binned,
+27,idba_ud,metabat2,Correctly Binned,
+28,megahit,concoct,Correctly Binned,
+29,megahit,dastool,Correctly Binned,
+30,megahit,maxbin2,Correctly Binned,
+31,megahit,metabat2,Correctly Binned,
+32,metaspades,concoct,Correctly Binned,
+33,metaspades,dastool,Correctly Binned,
+34,metaspades,maxbin2,Correctly Binned,
+35,metaspades,metabat2,Correctly Binned,
