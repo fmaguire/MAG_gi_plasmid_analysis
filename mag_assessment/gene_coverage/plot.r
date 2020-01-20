@@ -48,7 +48,8 @@ BuildBoxPlot <- function(ggplotObject, fileName)
     geom_boxplot(outlier.colour = 'black', outlier.shape = 16, outlier.size=1, notch = FALSE) +
     facet_grid(.~Assembly_Tool, labeller = label_both, scales="free") +
     theme_light() +
-    theme(axis.text.x = element_text(angle=45, hjust=1)) 
+    theme(axis.text.x = element_text(angle=45, hjust=1)) +
+    scale_fill_brewer(palette="Set3")
   ggsave(fileName, plot = p, device = "png", width = 9, height = 4)
 }
 
