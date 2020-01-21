@@ -36,7 +36,7 @@ BuildBarPlot <- function(ggplotObject, fileName, colorSet = 1)
     geom_bar(stat = "identity", position = position_dodge(width = 0.9))+
     ylim(0,100)+
     theme_light() +
-    theme(axis.text.x = element_text(angle=45, hjust=1)) +
+    theme(axis.text.x = element_text(angle=45, hjust=1)) 
     scale_fill_manual(values=colors)
   ggsave(fileName, plot = p, device = "png", width = 9, height = 4)
 }
@@ -60,7 +60,8 @@ BuildPointPlot<- function(ggplotObject, fileName)
     geom_point(aes(shape = `Assembly Tool`, color = `Binning Tool`), size = 1.5, stroke=1) +
     coord_flip() +
     theme_light() +
-    theme(axis.text.x = element_text(angle=45, hjust=1))
+    theme(axis.text.x = element_text(angle=45, hjust=1))+
+    theme(axis.text.y = element_text(face="italic"))
   ggsave(fileName, plot = p, device = "png", width = 9, height = 4)
 }
 
@@ -114,7 +115,7 @@ rateOfLossData <- read_tsv("./data/rateOfLoss.tsv", col_names = TRUE) %>%
   `colnames<-`(c("Binning Tool","Assembly Tool", "Category", "Relative", "Group")) %>% correctToolNames()
 
 #draw the plots from data
-topHitsPerBinPlot <- (ggplot(topHitsPerBinData, aes(x=Species, y=Coverage)) + ylab("Percent Coverage of Top Hit Genome") + xlab("Source Genome")) %>% 
+topHitsPerBinPlot <- (ggplot(topHitsPerBinData, aes(x=Species, y=Coverage)) + ylab("Percent Coverage of Top Hit Genome") + xlab(("Source Genome"))) %>% 
   BuildPointPlot("top_hits_per_bin.png")
 
 binCoveragePlot <- (ggplot(binCoverageData, aes(x=`Binning Tool`, y=Coverage, fill = `Binning Tool`)) + ylab("Percent Coverage of Top Hit Genome") + xlab("Binner")) %>% 
