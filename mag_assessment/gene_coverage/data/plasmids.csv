@@ -23,15 +23,15 @@
 21,metaspades,dastool,Binned,18.461538461538463
 22,metaspades,maxbin2,Binned,64.61538461538461
 23,metaspades,metabat2,Binned,6.153846153846154
-24,idba_ud,concoct,Correctly Binned,
-25,idba_ud,dastool,Correctly Binned,
-26,idba_ud,maxbin2,Correctly Binned,
-27,idba_ud,metabat2,Correctly Binned,
-28,megahit,concoct,Correctly Binned,
-29,megahit,dastool,Correctly Binned,
-30,megahit,maxbin2,Correctly Binned,
-31,megahit,metabat2,Correctly Binned,
-32,metaspades,concoct,Correctly Binned,
-33,metaspades,dastool,Correctly Binned,
-34,metaspades,maxbin2,Correctly Binned,
-35,metaspades,metabat2,Correctly Binned,
+24,idba_ud,concoct,Correctly Binned,7.6923076923076925
+25,idba_ud,dastool,Correctly Binned,1.5384615384615385
+26,idba_ud,maxbin2,Correctly Binned,3.076923076923077
+27,idba_ud,metabat2,Correctly Binned,4.615384615384616
+28,megahit,concoct,Correctly Binned,12.307692307692308
+29,megahit,dastool,Correctly Binned,6.153846153846154
+30,megahit,maxbin2,Correctly Binned,13.846153846153847
+31,megahit,metabat2,Correctly Binned,3.076923076923077
+32,metaspades,concoct,Correctly Binned,29.230769230769234
+33,metaspades,dastool,Correctly Binned,12.307692307692308
+34,metaspades,maxbin2,Correctly Binned,21.53846153846154
+35,metaspades,metabat2,Correctly Binned,4.615384615384616
