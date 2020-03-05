@@ -36,7 +36,7 @@ BuildBarPlot <- function(ggplotObject, fileName, colorSet = 1)
     geom_bar(stat = "identity", position = position_dodge(width = 0.9))+
     ylim(0,100)+
     theme_light() +
-    theme(axis.text.x = element_text(angle=45, hjust=1)) 
+    theme(axis.text.x = element_text(angle=45, hjust=1)) +
     scale_fill_manual(values=colors)
   ggsave(fileName, plot = p, device = "png", width = 9, height = 4)
 }
@@ -49,7 +49,7 @@ BuildBoxPlot <- function(ggplotObject, fileName)
     facet_grid(.~`Assembly Tool`, labeller = label_both, scales="free") +
     theme_light() +
     theme(axis.text.x = element_text(angle=45, hjust=1)) +
-    scale_fill_brewer(palette="Set3")
+    scale_fill_manual(values=c("#f8766d", "#7cae00", "#00bfc4","#c77cff", "#FFC0CB"))
   ggsave(fileName, plot = p, device = "png", width = 9, height = 4)
 }
 
@@ -125,22 +125,22 @@ binPurityPlot <- (ggplot(binPurityData, aes(x=`Binning Tool`, y=Num_Species, fil
   BuildBoxPlot("bin_purity.png")
 
 plasmidRecoveryPlot <- (ggplot(plasmidRecoveryData, aes(x=`Binning Tool`, y=Percent, fill=Category)) + ylab("Percent of Plasmids Recovered (>50% Coverage)") + xlab("Binner")) %>% 
-  BuildBarPlot("plasmid_recovery.png")
+  BuildBarPlot("plasmid_recovery.png", 1)
 
 giRecoveryPlot <- (ggplot(giRecoveryData, aes(x=`Binning Tool`, y=Percent, fill=Category)) + ylab("Percent of GIs Recovered (>50% Coverage)") + xlab("Binner")) %>% 
-  BuildBarPlot("GI_recovery.png")
+  BuildBarPlot("GI_recovery.png", 1)
 
 predictedGenesPlot <- (ggplot(predictedGenesData, aes(x=`Binning Tool`, y=Count, fill=`Binning Tool`)) + ylab("Number of predicted Genes Per Bin") + xlab("Binner")) %>% 
   BuildBoxPlot("number_of_predicted_genes.png")
 
 amrRecoveryPlot <- (ggplot(amrRecoveryData, aes(x=`Binning Tool`, y=Relative, fill=Category)) + ylab("Proportion of Reference AMR genes") + xlab("Binner")) %>% 
-  BuildBarPlot("amr_recovery.png")
+  BuildBarPlot("amr_recovery.png",1)
 
 amrLocalizationRecoveryPlot <- (ggplot(amrLocalizationRecoveryData, aes(x=`Binning Tool`, y=Relative, fill=Category)) + ylab("Proportion of Reference AMR genes") + xlab("Binner")) %>% 
   BuildBarPlot("amr_localization_recovery.png",2)
 
 vfRecoveryPlot <- (ggplot(vfRecoveryData, aes(x=`Binning Tool`, y=Relative, fill=Category)) + ylab("Proportion of Reference VF genes") + xlab("Binner")) %>% 
-  BuildBarPlot("vf_recovery.png")
+  BuildBarPlot("vf_recovery.png",1)
 
 vfLocalizationRecoveryPlot <- (ggplot(vfLocalizationRecoveryData, aes(x=`Binning Tool`, y=Relative, fill=Category)) + ylab("Proportion of Reference VF Genes") + xlab("Binner")) %>% 
   BuildBarPlot("vf_localization_recovery.png",2)
