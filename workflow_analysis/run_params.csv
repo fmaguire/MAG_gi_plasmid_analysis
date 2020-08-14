@@ -1,0 +1,17 @@
+tool,label,run_params
+megahit,megahit_default,--k-min 21 --k-max 141 --k-step 12
+megahit,megahit_sensitive,--presets meta-sensitive
+megahit,megahit_large,--presets meta-large
+metaspades,metaspades_default,--meta
+metaspades,metaspades_plasmidspades,--plasmid
+idba_ud,idba_ud_default,
+metabat2,metabat2_default,
+metabat2,metabat2_more_edges,--maxEdges 400,
+metabat2,metabat2_low_score,--maxP 90,
+metabat2,metabat2_small_bins,--minClsSize 2500
+maxbin2,maxbin2_default,
+maxbin2,maxbin2_low_prob,-prob_threshold 0.75
+maxbin2,maxbin2_high_iteration,-max_iteration 100
+concoct,concoct_default,
+concoct,concoct_big_kmer,--kmer_length 6
+concoct,concoct_low_clusters,--clusters 100
