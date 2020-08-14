@@ -1,0 +1,22 @@
+dist: trusty
+sudo: false
+language: generic
+services:
+  - docker
+branches:
+  only:
+    - master
+install:
+  - source paper/ci/install.sh
+script:
+  - bash paper/build/build.sh
+cache:
+  directories:
+    - paper/ci/cache
+deploy:
+  provider: script
+  script: bash -o xtrace paper/ci/deploy.sh
+  skip_cleanup: true
+  on:
+    branch: master
+    condition: $TRAVIS_EVENT_TYPE = "push"

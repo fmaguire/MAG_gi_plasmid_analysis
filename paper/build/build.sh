@@ -14,18 +14,18 @@ export LC_ALL=en_US.UTF-8
 # Generate reference information
 echo >&2 "Retrieving and processing reference metadata"
 manubot process \
-  --content-directory=content \
-  --output-directory=output \
-  --cache-directory=ci/cache \
+  --content-directory=paper/content \
+  --output-directory=paper/output \
+  --cache-directory=paper/ci/cache \
   --log-level=INFO
 
 # pandoc settings
-CSL_PATH=build/assets/style.csl
-BIBLIOGRAPHY_PATH=output/references.json
-INPUT_PATH=output/manuscript.md
+CSL_PATH=paper/build/assets/style.csl
+BIBLIOGRAPHY_PATH=paper/output/references.json
+INPUT_PATH=paper/output/manuscript.md
 
 # Make output directory
-mkdir -p output
+mkdir -p paper/output
 
 # Create HTML output
 # http://pandoc.org/MANUAL.html
@@ -64,7 +64,7 @@ DOCKER_EXISTS="$(command -v docker || true)"
 if [ "${BUILD_PDF:-}" != "false" ] && [ -z "$DOCKER_EXISTS" ]; then
   echo >&2 "Exporting PDF manuscript using WeasyPrint"
   if [ -L images ]; then rm images; fi  # if images is a symlink, remove it
-  ln -s content/images
+  ln -s paper/content/images
   pandoc \
     --from=markdown \
     --to=html5 \
@@ -92,8 +92,8 @@ if [ "${BUILD_PDF:-}" != "false" ] && [ -n "$DOCKER_EXISTS" ]; then
     MANUBOT_ATHENAPDF_DELAY="${MANUBOT_ATHENAPDF_DELAY:-5000}"
     echo >&2 "Continuous integration build detected. Setting athenapdf --delay=$MANUBOT_ATHENAPDF_DELAY"
   fi
-  if [ -d output/images ]; then rm -rf output/images; fi  # if images is a directory, remove it
-  cp -R -L content/images output/
+  if [ -d paper/output/images ]; then rm -rf paper/output/images; fi  # if images is a directory, remove it
+  cp -R -L paper/content/images output/
   docker run \
     --rm \
     --shm-size=1g \
@@ -103,7 +103,7 @@ if [ "${BUILD_PDF:-}" != "false" ] && [ -n "$DOCKER_EXISTS" ]; then
     athenapdf \
     --delay=${MANUBOT_ATHENAPDF_DELAY:-1100} \
     manuscript.html manuscript.pdf
-  rm -rf output/images
+  rm -rf paper/output/images
 fi
 
 # Create DOCX output (if BUILD_DOCX environment variable equals "true")
