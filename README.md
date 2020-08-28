@@ -1,3 +1,7 @@
+
+[![DOI](https://zenodo.org/badge/179372262.svg)](https://zenodo.org/badge/latestdoi/179372262)
+
+
 # MAG Simulation
 
 ## Dataset Generation 
